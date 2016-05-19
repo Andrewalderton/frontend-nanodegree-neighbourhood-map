@@ -8,6 +8,7 @@
 
 var places = [
 	{
+		id: '1',
 		name: 'Brit Bar',
 		address: '118 High St, Weston-super-Mare',
 		lat: 51.3504617,
@@ -16,6 +17,7 @@ var places = [
 		tags: ['bars', 'pubs', 'nightlife']
 	},
 	{
+		id: '2',
 		name: 'The Imperial Public House',
 		address: '14 S Parade, Weston-super-Mare',
 		lat: 51.3502151,
@@ -24,6 +26,7 @@ var places = [
 		tags: ['bars', 'pubs', 'restaurant']
 	},
 	{
+		id: '3',
 		name: 'Yates\'s',
 		address: '12-20 Regent St, Weston-super-Mare',
 		lat: 51.3475307,
@@ -32,6 +35,7 @@ var places = [
 		tags: ['bars', 'pub', 'restaurant', 'nightlife']
 	},
 	{
+		id: '4',
 		name: 'Cabot Court Hotel',
 		address: '1 Knightstone Rd, Weston-super-Mare',
 		lat: 51.3506475,
@@ -40,6 +44,7 @@ var places = [
 		tags: ['hotel', 'bars', 'pubs', 'restaurant', 'nightlife']
 	},
 	{
+		id: '5',
 		name: 'The Tavern Inn The Town',
 		address: '57-59 Regent St, Weston-super-Mare',
 		lat: 51.3475274,
@@ -48,6 +53,7 @@ var places = [
 		tags: ['pubs', 'bars']
 	},
 	{
+		id: '6',
 		name: 'The Grand Pier',
 		address: 'Marine Parade, Weston-super-Mare',
 		lat: 51.3407389,
@@ -56,6 +62,7 @@ var places = [
 		tags: ['attractions', 'pier', 'family']
 	},
 	{
+		id: '7',
 		name: 'Seaquarium',
 		address: '7 Marine Parade, Weston-super-Mare',
 		lat: 51.3500859,
@@ -64,6 +71,7 @@ var places = [
 		tags: ['aquarium', 'attractions', 'family']
 	},
 	{
+		id: '8',
 		name: 'Puxton Park Tourist Attraction & Farmshop',
 		address: 'Cowslip Ln, Hewish',
 		lat: 51.3617887,
@@ -72,6 +80,7 @@ var places = [
 		tags: ['farm', 'attractions', 'family', 'adventure']
 	},
 	{
+		id: '9',
 		name: 'Weston-Super-Mare Station',
 		address: 'Station Approach, Weston-super-Mare',
 		lat: 51.3443074,
@@ -80,6 +89,7 @@ var places = [
 		tags: ['trains', 'stations', 'railway']
 	},
 	{
+		id: '10',
 		name: 'Weston Milton Train Station',
 		address: 'Weston Milton Train Station, Weston-super-Mare',
 		lat: 51.34846,
@@ -88,6 +98,7 @@ var places = [
 		tags: ['trains', 'stations', 'railway']
 	},
 	{
+		id: '11',
 		name: 'Worle Train Station',
 		address: 'Park Way, Weston-super-Mare',
 		lat: 51.35803,
@@ -108,46 +119,14 @@ var places = [
 function initMap() {
     // Create a map object and specify the DOM element for display.
     var map = new google.maps.Map(document.getElementById('map'), {
-        center: {lat: 51.3517278, lng: -2.9797165},
+        center: {lat: 51.3517278, lng: -2.9497165},
         scrollwheel: false,
         zoom: 13,
         mapTypeId: google.maps.MapTypeId.HYBRID
     });
 
-var infowindow = new google.maps.InfoWindow();
+	var infowindow = new google.maps.InfoWindow();
 
-places.forEach(function(place) {
-	var latLng = {lat: place.lat, lng: place.lng};
-	var contentName = place.name;
-	var contentAddress = place.address;
-	var setContent = '<h5>' + contentName + '</h5>' + '<br>' + 'Address: ' + contentAddress;
-
-	var marker = new google.maps.Marker({
-	    position: latLng,
-	    map: map,
-	});
-
-	marker.addListener('click', function() {
-		infowindow.open(map, marker);
-		infowindow.setContent(setContent);
-	});
-});
-
-
-
-// *******************************
-// *         PLACE OBJECT        *
-// *******************************
-
-
-var Place = function(data, parent) {
-	// info from provided data model
-	this.name = ko.observable(data.name);
-	this.address = ko.observable(data.address);
-	this.lat = ko.observable(data.lat);
-	this.lng = ko.observable(data.lng);
-	this.tags = ko.observableArray(data.tags);
-	//this.info = ko.observable(data.info);
 
 
 
@@ -156,14 +135,141 @@ var Place = function(data, parent) {
 // *******************************
 
 
-$(window).resize(function () {
-    var h = $(window).height(),
-        offsetTop = 190; // Calculate the top offset
+var KoViewModel = function() {
+    var self = this;
 
+    // PLace Object
+	var Place = function(place) {
+		// info from provided data model
+		this.id = ko.observable(place.id);
+		this.name = ko.observable(place.name);
+		this.address = ko.observable(place.address);
+		this.lat = ko.observable(place.lat);
+		this.lng = ko.observable(place.lng);
+		this.tags = ko.observableArray(place.tags);
+		this.info = ko.observable(place.info);
+		this.latLng = {lat: place.lat, lng: place.lng};
+
+	    this.marker = null;
+	};
+
+    self.allPlaces = ko.observableArray();
+
+	places.forEach(function(place) {
+	    self.allPlaces().push(new Place(place));
+	});
+
+    // Build Markers via the Maps API and place them on the map.
+    self.allPlaces().forEach(function(place) {
+
+	    var markerOptions = {
+	      position: place.latLng,
+		  map: map,
+	    };
+
+	    place.marker = new google.maps.Marker(markerOptions);
+
+	    place.marker.addListener('click', function() {
+		 	infowindow.open(map, place.marker);
+		 	infowindow.setContent('<h5>' + place.name() + '</h5><br>' + place.address());
+		});
+    });
+
+	self.visiblePlaces = ko.observableArray();
+
+	self.allPlaces().forEach(function(place) {
+	    self.visiblePlaces.push(place);
+	});
+
+	// This, along with the data-bind on the <input> element, lets KO keep
+	// constant awareness of what the user has entered.
+	self.userInput = ko.observable('');
+
+
+	// If the user input string
+	// can be found in the place name, then the place is allowed to remain
+	// visible. All other markers are removed.
+	self.filterMarkers = function() {
+	    var searchInput = self.userInput().toLowerCase();
+
+	    self.visiblePlaces.removeAll();
+
+	    // This looks at the name of each places and then determines if the user
+	    // input can be found within the place name.
+	    self.allPlaces().forEach(function(place) {
+	        place.marker.setVisible(false);
+
+	        if ((place.name().toLowerCase().indexOf(searchInput) !== -1) || (place.tags().indexOf(searchInput) !== -1)) {
+	            self.visiblePlaces.push(place);
+	        }
+	    });
+
+	    if (self.visiblePlaces().length > 0)
+
+	    self.visiblePlaces().forEach(function(place) {
+	        place.marker.setVisible(true);
+	    });
+	};
+
+
+	// Filter Buttons Function
+	self.filterPlaces = function(type) {
+
+		self.visiblePlaces.removeAll();
+
+		self.allPlaces().forEach(function(place) {
+			place.marker.setVisible(false);
+
+			if (place.tags().indexOf(type) !== -1) {
+				self.visiblePlaces.push(place);
+			}
+		});
+
+		if (self.visiblePlaces().length > 0) {
+	    	self.visiblePlaces().forEach(function(place) {
+	        	place.marker.setVisible(true);
+	    	});
+		}
+	};
+
+};
+
+ko.applyBindings(new KoViewModel());
+
+
+
+
+// *******************************
+// *      OTHER FUNCTIONS        *
+// *******************************
+
+// Close previous list-view tab when another is selected
+$(document).click(function (event) {
+    var clickover = $(event.target);
+    var $navbar = $(".collapse");
+    var _opened = $navbar.hasClass("in");
+    if (_opened === true && !clickover.hasClass("navbar-toggle")) {
+        $navbar.collapse('hide');
+    }
+});
+
+var selector = '.nav li';
+
+$(selector).on('click', function(){
+    $(selector).removeClass('active');
+    $(this).addClass('active');
+});
+
+// Change height of google map depending on screen size.
+$(window).resize(function() {
+    var h = $(window).height(),
+        offsetTop = $(document.getElementsByClassName("navbar-default")).height(); // Calculate the top offset
     $('#map').css('height', (h - offsetTop));
+    $('#map-view').css('height', (h - offsetTop));
 }).resize();
 }
 
+// Set height of main-img to fit screen size.
 function imgHeight() {
 	$(document.getElementsByClassName("main-img")).height($(window).height());
 	$(document.getElementById("map-view")).height($(window).height());
@@ -172,115 +278,17 @@ imgHeight();
 
 // Smooth Scrolling - https://css-tricks.com/snippets/jquery/smooth-scrolling/
 $(function() {
-  $('a[href*="#"]:not([href="#"])').click(function() {
-    if (location.pathname.replace(/^\//,'') == this.pathname.replace(/^\//,'') && location.hostname == this.hostname) {
-      var target = $(this.hash);
-      target = target.length ? target : $('[name=' + this.hash.slice(1) +']');
-      if (target.length) {
-        $('html, body').animate({
-          scrollTop: target.offset().top
-        }, 1000);
-        return false;
-      }
-    }
-  });
-});
+    $('a[href*="#"]:not([href="#"])').click(function() {
+        if (location.pathname.replace(/^\//,'') == this.pathname.replace(/^\//,'') && location.hostname == this.hostname) {
+            var target = $(this.hash);
+            target = target.length ? target : $('[name=' + this.hash.slice(1) +']');
 
-// Append place names to filter list
-places.forEach(function(place) {
-	$('.list-group').append('<button type="button" class="list-group-item">' + place.name + '</button>');
-});
-
-
-// Filter functions
-
-var KoViewModel = function() {
-  var self = this;
-
-  // Build "Place" objects out of raw place data. It is common to receive place
-  // data from an API like FourSquare. Place objects are defined by a custom
-  // constructor function you write, which takes what you need from the original
-  // data and also lets you add on anything else you need for your app, not
-  // limited by the original data.
-  self.allPlaces = [];
-  locationData.forEach(function(place) {
-    self.allPlaces.push(new Place(place));
-  });
-
-
-  // Build Markers via the Maps API and place them on the map.
-  self.allPlaces.forEach(function(place) {
-    var markerOptions = {
-      map: self.googleMap,
-      position: place.latLng
-    };
-
-    place.marker = new google.maps.Marker(markerOptions);
-
-    // You might also add listeners onto the marker, such as "click" listeners.
-  });
-
-
-  // This array will contain what its name implies: only the markers that should
-  // be visible based on user input. My solution does not need to use an
-  // observableArray for this purpose, but other solutions may require that.
-  self.visiblePlaces = ko.observableArray();
-
-
-  // All places should be visible at first. We only want to remove them if the
-  // user enters some input which would filter some of them out.
-  self.allPlaces.forEach(function(place) {
-    self.visiblePlaces.push(place);
-  });
-
-
-  // This, along with the data-bind on the <input> element, lets KO keep
-  // constant awareness of what the user has entered. It stores the user's
-  // input at all times.
-  self.userInput = ko.observable('');
-
-
-  // The filter will look at the names of the places the Markers are standing
-  // for, and look at the user input in the search box. If the user input string
-  // can be found in the place name, then the place is allowed to remain
-  // visible. All other markers are removed.
-  self.filterMarkers = function() {
-    var searchInput = self.userInput().toLowerCase();
-
-    self.visiblePlaces.removeAll();
-
-    // This looks at the name of each places and then determines if the user
-    // input can be found within the place name.
-    self.allPlaces.forEach(function(place) {
-      place.marker.setVisible(false);
-
-      if (place.locationName.toLowerCase().indexOf(searchInput) !== -1) {
-        self.visiblePlaces.push(place);
-      }
+        if (target.length) {
+            $('html, body').animate({scrollTop: target.offset().top}, 1000);
+            return false;
+        }}
     });
-
-
-    self.visiblePlaces().forEach(function(place) {
-      place.marker.setVisible(true);
-    });
-  };
-
-
-  function Place(dataObj) {
-    this.locationName = dataObj.locationName;
-    this.latLng = dataObj.latLng;
-
-    // You will save a reference to the Places' map marker after you build the
-    // marker:
-    this.marker = null;
-  }
-
-};
-
-ko.applyBindings(new KoViewModel());
-
-
-
+});
 
 
 

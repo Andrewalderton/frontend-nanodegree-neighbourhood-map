@@ -13,14 +13,23 @@ html, body {
     font-family: 'Montserrat', sans-serif;
 	font-weight: 400;
 	color: #333;
+}
 
+ul {
+	list-style: none;
+	padding: 10px;
+}
+
+li {
+	padding: 10px;
 }
 
 #map {
 	width: 100%;
 	min-height: 100%;
-
+	float: right;
 }
+
 
 #main-header {
 	position: absolute;
@@ -34,6 +43,7 @@ html, body {
 	color: #fb5e8d;
 	font-size: 150%;
 }
+
 
 /* Images */
 img {
@@ -67,16 +77,10 @@ img {
 	border-bottom: 2px solid #fb5e8d;
 }
 
-.nav-pills > li.active > a,  .nav>li>a:hover,  .nav>li.active>a:hover {
-	background-color: #fb5e8d;
-}
-
-.nav-pills > li.active > a, .active {
-	padding: 10px;
-}
 
 .nav>li>a {
-	color: #777;
+	background-color: #373737;
+	color: white;
 }
 
 .nav>li>a:hover {
@@ -84,6 +88,29 @@ img {
 }
 
 
+.nav-pills>li.active>a, .nav-pills>li.active>a:focus, .nav-pills>li.active>a:hover, .nav-pills>li>a:hover{
+	background-color: #fb5e8d;
 
+}
 
+.navbar-brand {
+	margin-bottom: 0;
+	text-align: center;
+}
+
+.well {
+	margin: 0;
+}
+
+.description {
+	font-style: italic;
+}
+
+.navbar {
+	margin-bottom: 0;
+}
+
+.navbar-main {
+	height: 100%;
+}
 
