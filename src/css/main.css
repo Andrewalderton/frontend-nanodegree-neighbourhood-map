@@ -93,9 +93,14 @@ img {
 
 }
 
-.navbar-brand {
+.navbar-brand, .nav > li > a.navbar-brand {
 	margin-bottom: 0;
 	text-align: center;
+	background-color: transparent;
+}
+
+.nav > li > a.navbar-brand:hover {
+	color: #fb5e8d;
 }
 
 .well {

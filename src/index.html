@@ -11,7 +11,6 @@
     <!-- Place favicon.ico in the root directory -->
     <link href='https://fonts.googleapis.com/css?family=Montserrat:400,700' rel='stylesheet' type='text/css'>
     <link rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap.min.css">
-    <link rel="stylesheet" href="bower_components/animate.css">
     <link rel="stylesheet" href="css/main.css">
 
   </head>
@@ -40,7 +39,11 @@
                   <span class="icon-bar"></span>
                   <span class="icon-bar"></span>
                 </button>
-                <h4 class="navbar-brand">NEIGHBOURHOOD: Weston-Super-Mare, UK</h4>
+                <ul class="nav">
+                  <li><a href="#" class="navbar-brand" data-bind="click: function() { showAllPlaces() }">
+                    <h4>NEIGHBOURHOOD: Weston-Super-Mare, UK</h4>
+                  </a></li>
+                </ul>
               </div>
               <div id="navbar" class="collapse navbar-collapse navbar-main">
 
@@ -72,12 +75,16 @@
             </div><!-- /input-group -->
 
             <div class="list-group" role="group" aria-label="..." data-bind="foreach: visiblePlaces">
-              <button type="button" class="list-group-item btn-group-justified" data-toggle="collapse" aria-expanded="false" data-bind="text: name,  attr: { 'data-target': '#collapseText' + id() }"></button>
+              <button type="button" class="list-group-item btn-group-justified" data-toggle="collapse" aria-expanded="false" data-bind="text: name,  attr: { 'data-target': '#collapseText' + id() }, click: function() { $parent.listClick(this) }"></button>
 
               <div class="collapse" data-bind="attr: { id: 'collapseText' + id() }">
                 <div class="well">
                   <h6>ADDRESS</h6><span class="description" data-bind="text: address()"></span><hr>
-                  <h6>DESCRIPTION</h6><span class="description" data-bind="text: info()"></span>
+                  <h6>DESCRIPTION</h6><span class="description" data-bind="text: info()"></span><hr>
+
+                  <div data-bind="if: $parent.venueUrl, if: $parent.venuePhone"><h6>CONTACT</h6></div>
+                  <span class="description" data-bind="text: $parent.venueUrl"></span><br>
+                  <span class="description" data-bind="text: $parent.venuePhone"></span>
                 </div>
               </div>
             </div>
@@ -97,7 +104,6 @@
         <script src="bower_components/jquery/dist/jquery.min.js"></script>
         <script src="bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
         <script src="bower_components/knockout/dist/knockout.js"></script>
-
         <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCK6yfy3VmtcsIUB03GNa4Rc7w8Zjak57Y&callback=initMap" async defer></script>
         <script src="js/main.js"></script>
     </div><!-- container -->
