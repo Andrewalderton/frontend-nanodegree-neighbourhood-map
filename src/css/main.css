@@ -13,6 +13,7 @@ html, body {
     font-family: 'Montserrat', sans-serif;
 	font-weight: 400;
 	color: #333;
+	background-color: #f2f2f2;
 }
 
 ul {
@@ -20,8 +21,9 @@ ul {
 	padding: 10px;
 }
 
-li {
-	padding: 10px;
+li > a {
+	margin: 20px 10px;
+
 }
 
 #map {
@@ -29,7 +31,6 @@ li {
 	min-height: 100%;
 	float: right;
 }
-
 
 #main-header {
 	position: absolute;
@@ -44,10 +45,11 @@ li {
 	font-size: 150%;
 }
 
-
 /* Images */
 img {
-	max-width: 100%;
+	width: 100%;
+	max-height: 300px;
+	object-fit: cover;
 	border-bottom: 2px solid #fb5e8d;
 }
 
@@ -59,7 +61,8 @@ img {
     width: 100%;
     object-fit: cover;
     border-bottom: 2px solid #fb5e8d;
-    margin-bottom: 50px;
+    margin-bottom: 0;
+    padding: 0;
 }
 
 .no-gutter > [class*='col-'] {
@@ -73,10 +76,9 @@ img {
 	margin-top: 50px;
 }
 
-.input-group, #map {
+#map {
 	border-bottom: 2px solid #fb5e8d;
 }
-
 
 .nav>li>a {
 	background-color: #373737;
@@ -87,16 +89,16 @@ img {
 	color: white;
 }
 
-
 .nav-pills>li.active>a, .nav-pills>li.active>a:focus, .nav-pills>li.active>a:hover, .nav-pills>li>a:hover{
 	background-color: #fb5e8d;
-
 }
 
 .navbar-brand, .nav > li > a.navbar-brand {
-	margin-bottom: 0;
+	margin: 0;
 	text-align: center;
 	background-color: transparent;
+	width: 75%;
+	margin-bottom: 20px;
 }
 
 .nav > li > a.navbar-brand:hover {
@@ -117,5 +119,17 @@ img {
 
 .navbar-main {
 	height: 100%;
+}
+
+.ui-menu-item {
+	color: white;
+	background-color: #333;
+}
+
+.list-group-item.active, .list-group-item.active:focus, .list-group-item.active:hover{
+	background-color: #333;
+	color: white;
+	outline: none;
+	border: none;
 }
 

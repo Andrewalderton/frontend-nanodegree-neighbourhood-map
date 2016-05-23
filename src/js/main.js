@@ -121,27 +121,11 @@ function initMap() {
     var map = new google.maps.Map(document.getElementById('map'), {
         center: {lat: 51.3517278, lng: -2.9497165},
         scrollwheel: false,
-        zoom: 13,
+        zoom: 12,
         mapTypeId: google.maps.MapTypeId.HYBRID
     });
 
 	var infowindow = new google.maps.InfoWindow();
-
-
-
-// Place Object
-var Place = function(place) {
-	// info from provided data model
-	this.id = ko.observable(place.id);
-	this.name = ko.observable(place.name);
-	this.address = ko.observable(place.address);
-	this.lat = ko.observable(place.lat);
-	this.lng = ko.observable(place.lng);
-	this.tags = ko.observableArray(place.tags);
-	this.info = ko.observable(place.info);
-	this.latLng = {lat: place.lat, lng: place.lng};
-	this.marker = ko.observable(null);
-};
 
 
 
@@ -153,8 +137,20 @@ var Place = function(place) {
 
 var KoViewModel = function() {
     var self = this;
-    self.venueUrl = ko.observable();
-    self.venuePhone = ko.observable();
+
+	// Place Object
+	var Place = function(place) {
+		// info from provided data model
+		this.id = ko.observable(place.id);
+		this.name = ko.observable(place.name);
+		this.address = ko.observable(place.address);
+		this.lat = ko.observable(place.lat);
+		this.lng = ko.observable(place.lng);
+		this.tags = ko.observableArray(place.tags);
+		this.info = ko.observable(place.info);
+		this.latLng = {lat: place.lat, lng: place.lng};
+		this.marker = ko.observable(null);
+	};
 
     self.allPlaces = ko.observableArray();
 
@@ -174,9 +170,10 @@ var KoViewModel = function() {
 
 	    place.marker.addListener('click', function() {
 		 	infowindow.open(map, place.marker);
-		 	infowindow.setContent('<h5>' + place.name() + '</h5><br>' + place.address());
+		 	//infowindow.setContent('<h5>' + place.name() + '</h5><br>' + place.address());
 		 	place.marker.setAnimation(google.maps.Animation.BOUNCE);
 			setTimeout(function(){place.marker.setAnimation(null);}, 1450);
+			self.infoRequest(place);
 		});
     });
 
@@ -187,17 +184,51 @@ var KoViewModel = function() {
 	    self.visiblePlaces.push(place);
 	});
 
-	// This, along with the data-bind on the <input> element, lets KO keep
-	// constant awareness of what the user has entered.
+	// Keep constant awareness of user input along with data-bind on <input> element.
 	self.userInput = ko.observable('');
+
+	// Create array of place names for use with autocomplete plugin.
+	var filterNames = [];
+	self.allPlaces().forEach(function(place) {
+		filterNames.push(place.name());
+	});
+
+	// Auto-complete jquery plugin
+	$(function() {
+		$( "#filter" ).autocomplete({
+		    source: filterNames,
+		    autoFocus: true,
+		});
+	});
+
+	// Run the filterInput function when enter key is pressed.
+	window.addEventListener("keyup", checkKeyPressed, false);
+	function checkKeyPressed(e) {
+		if (e.keyCode == "13") {
+			self.filterInput();
+		}
+	};
+
+	// Function to run whenever 'enter' key pressed, or search icon is clicked.
+	self.filterInput = function() {
+		// Manually update the userInput, as the input does not
+		//recognise when an autocomplete suggestion is clicked.
+		var filterInput = $('#filter').val();
+		self.userInput(filterInput);
+		self.filterMarkers();
+		// Clear the input after list-view and markers have been filtered.
+		self.userInput(undefined);
+	};
 
 	// Check user input string against place names and tags.
 	// Matching markers remain; all other markers are removed.
 	self.filterMarkers = function() {
-	    var searchInput = self.userInput().toLowerCase();
+		// Clear current places from the view.
 	    self.visiblePlaces.removeAll();
 	    infowindow.close();
 	    $('.nav li').removeClass('active');
+
+	    var searchInput = self.userInput().toLowerCase();
 
 	    // Look at place names and tags to determine if the user input matches.
 	    self.allPlaces().forEach(function(place) {
@@ -212,9 +243,8 @@ var KoViewModel = function() {
 	    	self.visiblePlaces().forEach(function(place) {
 	        	place.marker.setVisible(true);
 	    	});
-		}
+		};
 	};
-
 
 	// Filter Buttons Function
 	self.filterPlaces = function(type) {
@@ -235,7 +265,7 @@ var KoViewModel = function() {
 		}
 	};
 
-	// Reset filter when navbar header is clicked
+	// Reset the view when navbar header is clicked
 	self.showAllPlaces = function() {
 		infowindow.close();
 		self.visiblePlaces.removeAll();
@@ -248,14 +278,20 @@ var KoViewModel = function() {
 	    });
 	};
 
-
 	// Set markers to bounce when list-view items clicked
-	// Trigger Foursquare Ajax request
 	self.listClick = function(place) {
+		google.maps.event.trigger(place.marker, 'click');
+	};
+
+	self.venueUrl = ko.observable();
+    self.venuePhone = ko.observable();
+
+	// Trigger Foursquare Ajax request
+	self.infoRequest = function(place) {
+		// Clear current URL and Phone
 		self.venueUrl(null);
     	self.venuePhone(null);
 
-        google.maps.event.trigger(place.marker, 'click');
         var venue = ko.observable();
 
         place.url = ko.observable(place.url);
@@ -276,17 +312,50 @@ var KoViewModel = function() {
 			}
 
 			if ((place.url() !=null || undefined ) && (place.phone() !=null || undefined)) {
-				infowindow.setContent('<h5>' + place.name() + '</h5><br>' + place.url() + '<br>' + place.phone() + '<br>' + place.address());
+				infowindow.setContent('<h5>' + place.name() + '</h5><br>' + '<h6>Website: </h6>' + place.url() + '<br>' + '<h6>Phone: </h6>' + place.phone() + '<br>' + '<h6>Address: </h6>' + place.address());
 			} else
 			if ((place.url() !=null || undefined) && (place.phone() =null || undefined)) {
-				infowindow.setContent('<h5>' + place.name() + '</h5><br>' + place.url() + place.address());
+				infowindow.setContent('<h5>' + place.name() + '</h5><br>' + '<h6>Website: </h6>' + place.url() + '<h6>Address: </h6>' + place.address());
 			} else
 			if ((place.url =null || undefined) && (place.phone() !=null || undefined)) {
-				infowindow.setContent('<h5>' + place.name() + '</h5><br>' + place.address() + '<br>' + place.phone());
+				infowindow.setContent('<h5>' + place.name() + '</h5><br>' + '<h6>Phone: </h6>' + place.phone() + '<br>' + '<h6>Address: </h6>' + place.address());
 			} else {
-				infowindow.setContent('<h5>' + place.name() + '</h5><br>' + place.address());
+				infowindow.setContent('<h5>' + place.name() + '</h5><br>' + '<h6>Address: </h6>' + place.address());
 			}
 		});
+	};
+
+	self.visiblePhotos = ko.observableArray();
+	self.flickrImg = ko.observable();
+
+	// Flickr photo API request
+	self.photoRequest = function(place) {
+		self.visiblePhotos.removeAll();
+		var flickrKey = '153430b4e3a967170f237d09583ee9f1';
+	    var placeName = place.name();
+	    var flickrAPI = 'https://api.flickr.com/services/rest/?method=flickr.photos.search';
+
+	    $.getJSON(flickrAPI, {
+	        api_key: flickrKey,
+	        extras: "geo",
+	        has_geo: 1,
+	        per_page: 3,
+	        tags: placeName,
+	        tagmode: "all",
+	        format: "json",
+	        nojsoncallback: 1
+	    }).done(function(data) {
+
+            var allPhotos = data.photos.photo;
+
+            allPhotos.forEach(function(photo){
+                // Build the url of the photo in order to link to it
+     			self.flickrImg('<img src="http://farm' + photo.farm + '.static.flickr.com/' + photo.server + '/' + photo.id + '_' + photo.secret + '_z.jpg">');
+  				self.visiblePhotos.push(self.flickrImg());
+            });
+        }).fail(function() {
+            console.warn('error');
+        });
 	};
 };
 
@@ -311,7 +380,7 @@ $(document).click(function (event) {
 });
 
 // Toggle 'active' class for filter buttons
-var selector = '.nav li';
+var selector = '.nav li, button.btn-group-justified';
 
 $(selector).on('click', function(){
     $(selector).removeClass('active');
@@ -347,6 +416,9 @@ $(function() {
         }}
     });
 });
+
+
+
 
 
 
