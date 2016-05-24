@@ -152,6 +152,14 @@ var KoViewModel = function() {
 		this.marker = ko.observable(null);
 	};
 
+	self.venueUrl = ko.observable();
+    self.venuePhone = ko.observable();
+
+	self.infoError = ko.observable();
+	self.ajaxError = ko.observable(false);
+	self.visiblePhotos = ko.observableArray();
+	self.flickrImg = ko.observable();
+
     self.allPlaces = ko.observableArray();
 
 	places.forEach(function(place) {
@@ -170,7 +178,6 @@ var KoViewModel = function() {
 
 	    place.marker.addListener('click', function() {
 		 	infowindow.open(map, place.marker);
-		 	//infowindow.setContent('<h5>' + place.name() + '</h5><br>' + place.address());
 		 	place.marker.setAnimation(google.maps.Animation.BOUNCE);
 			setTimeout(function(){place.marker.setAnimation(null);}, 1450);
 			self.infoRequest(place);
@@ -283,19 +290,20 @@ var KoViewModel = function() {
 		google.maps.event.trigger(place.marker, 'click');
 	};
 
-	self.venueUrl = ko.observable();
-    self.venuePhone = ko.observable();
-
 	// Trigger Foursquare Ajax request
 	self.infoRequest = function(place) {
+		// reset error status
+		self.ajaxError(false);
+		self.infoError(false);
+
 		// Clear current URL and Phone
 		self.venueUrl(null);
     	self.venuePhone(null);
 
         var venue = ko.observable();
-
         place.url = ko.observable(place.url);
         place.phone = ko.observable(place.phone);
+        var infoArray = ko.observableArray();
 
         var foursquareUrl = 'https://api.foursquare.com/v2/venues/search?ll=' +place.lat()+ ',' +place.lng()+ '&intent=match&name='+place.name()+'&client_id=OXYOWWZSQILOKF21ZNLDZ0050FIJMRRBG0RPKSH2ZEEVUDEV&client_secret=UNWECJ2HMPBYHOWT4ZK0MK4ZDOFE5CRQYQIT514ZNU3V2DCP&v=20160519';
 
@@ -303,33 +311,31 @@ var KoViewModel = function() {
 	    	venue = data.response.venues[0];
 
 			if ((venue !=undefined) && (venue.hasOwnProperty('url'))) {
-				place.url(venue.url);
 				self.venueUrl(venue.url);
+				infoArray.push(venue.url + '<br>');
 			}
 			if ((venue !=undefined) && (venue.hasOwnProperty('contact')) && (venue.contact.hasOwnProperty('formattedPhone'))) {
-				place.phone(venue.contact.formattedPhone);
 				self.venuePhone(venue.contact.formattedPhone);
+				infoArray.push(venue.contact.formattedPhone + '<br>');
 			}
 
-			if ((place.url() !=null || undefined ) && (place.phone() !=null || undefined)) {
-				infowindow.setContent('<h5>' + place.name() + '</h5><br>' + '<h6>Website: </h6>' + place.url() + '<br>' + '<h6>Phone: </h6>' + place.phone() + '<br>' + '<h6>Address: </h6>' + place.address());
-			} else
-			if ((place.url() !=null || undefined) && (place.phone() =null || undefined)) {
-				infowindow.setContent('<h5>' + place.name() + '</h5><br>' + '<h6>Website: </h6>' + place.url() + '<h6>Address: </h6>' + place.address());
-			} else
-			if ((place.url =null || undefined) && (place.phone() !=null || undefined)) {
-				infowindow.setContent('<h5>' + place.name() + '</h5><br>' + '<h6>Phone: </h6>' + place.phone() + '<br>' + '<h6>Address: </h6>' + place.address());
-			} else {
+			infowindow.setContent('<h5>' + place.name() + '</h5><br>' + infoArray().join("") + '<h6>Address: </h6>' + place.address());
+
+			if (infoArray = null) {
+				// Set content for when information not available
 				infowindow.setContent('<h5>' + place.name() + '</h5><br>' + '<h6>Address: </h6>' + place.address());
+				self.infoError(true);
 			}
-		});
+		}).fail(function() {
+        	self.ajaxError(true);
+            infowindow.setContent('<h5>' + place.name() + '</h5><br>' + '<h6>Address: </h6>' + place.address());
+        });
 	};
-
-	self.visiblePhotos = ko.observableArray();
-	self.flickrImg = ko.observable();
 
 	// Flickr photo API request
 	self.photoRequest = function(place) {
+		// reset error status
+		self.ajaxError(false);
 		self.visiblePhotos.removeAll();
 		var flickrKey = '153430b4e3a967170f237d09583ee9f1';
 	    var placeName = place.name();
@@ -354,7 +360,8 @@ var KoViewModel = function() {
   				self.visiblePhotos.push(self.flickrImg());
             });
         }).fail(function() {
-            console.warn('error');
+        	self.ajaxError(true);
+            infowindow.setContent('<h5>' + place.name() + '</h5><br>' + '<h6>Address: </h6>' + place.address());
         });
 	};
 };
@@ -389,17 +396,17 @@ $(selector).on('click', function(){
 
 // Change height of google map depending on screen size.
 $(window).resize(function() {
-    var h = $(window).height(),
-        offsetTop = $(document.getElementsByClassName("navbar-default")).height(); // Calculate the top offset
-    $('#map').css('height', (h - offsetTop));
-    $('#map-view').css('height', (h - offsetTop));
+	var h = $(window).height(),
+	    offsetTop = $(document.getElementsByClassName("navbar-default")).height(); // Calculate the top offset
+	$('#map').css('height', (h - offsetTop));
+	$('#map-view').css('height', (h - offsetTop));
 }).resize();
 }
 
-// Set height of main-img to fit screen size.
+// Set height of 'main-img' to fit screen size.
 function imgHeight() {
-	$(document.getElementsByClassName("main-img")).height($(window).height());
-	$(document.getElementById("map-view")).height($(window).height());
+	$('.main-img').height($(window).height());
+	$('#map-view').height($(window).height());
 }
 imgHeight();
 

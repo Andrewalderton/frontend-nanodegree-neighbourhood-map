@@ -90,6 +90,12 @@
                   <span class="description" data-bind="text: $parent.venuePhone"></span><hr>
 
                   <span class="description" data-bind="html: $parent.visiblePhotos"></span>
+                  <div data-bind="visible: $parent.infoError">
+                    <h5>Additional information not currently available for this location</h5>
+                  </div>
+                  <div data-bind="visible: $parent.ajaxError">
+                    <h5>Looks like there was a problem retrieving your data. Not all information may be available.</h5>
+                  </div>
                 </div>
               </div>
             </div>
