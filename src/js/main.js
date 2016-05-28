@@ -140,7 +140,7 @@ var KoViewModel = function() {
 
 	// Place Object
 	var Place = function(place) {
-		// info from provided data model
+		// Information taken from provided data model
 		this.id = ko.observable(place.id);
 		this.name = ko.observable(place.name);
 		this.address = ko.observable(place.address);
@@ -155,11 +155,12 @@ var KoViewModel = function() {
 	self.venueUrl = ko.observable();
     self.venuePhone = ko.observable();
 
-	self.infoError = ko.observable();
+	self.infoError = ko.observable(false);
 	self.ajaxError = ko.observable(false);
 	self.visiblePhotos = ko.observableArray();
 	self.flickrImg = ko.observable();
 
+	// Create observable array to hold each place from the data model.
     self.allPlaces = ko.observableArray();
 
 	places.forEach(function(place) {
@@ -176,16 +177,17 @@ var KoViewModel = function() {
 
 	    place.marker = new google.maps.Marker(markerOptions);
 
+	    // Open infowindow and trigger marker animation when clicked.
 	    place.marker.addListener('click', function() {
 		 	infowindow.open(map, place.marker);
 		 	place.marker.setAnimation(google.maps.Animation.BOUNCE);
 			setTimeout(function(){place.marker.setAnimation(null);}, 1450);
+			// Get data for the infowindow.
 			self.infoRequest(place);
 		});
     });
 
 	self.visiblePlaces = ko.observableArray();
-
 	// Push places into visiblePlaces array, so all markers are visible when page loads.
 	self.allPlaces().forEach(function(place) {
 	    self.visiblePlaces.push(place);
@@ -214,21 +216,20 @@ var KoViewModel = function() {
 		if (e.keyCode == "13") {
 			self.filterInput();
 		}
-	};
+	}
 
 	// Function to run whenever 'enter' key pressed, or search icon is clicked.
 	self.filterInput = function() {
-		// Manually update the userInput, as the input does not
+		// Update the userInput, as the input binding does not
 		//recognise when an autocomplete suggestion is clicked.
 		var filterInput = $('#filter').val();
 		self.userInput(filterInput);
 		self.filterMarkers();
-		// Clear the input after list-view and markers have been filtered.
+		// Clear the search bar after list-view and markers have been filtered.
 		self.userInput(undefined);
 	};
 
 	// Check user input string against place names and tags.
-	// Matching markers remain; all other markers are removed.
 	self.filterMarkers = function() {
 		// Clear current places from the view.
 	    self.visiblePlaces.removeAll();
@@ -250,10 +251,10 @@ var KoViewModel = function() {
 	    	self.visiblePlaces().forEach(function(place) {
 	        	place.marker.setVisible(true);
 	    	});
-		};
+		}
 	};
 
-	// Filter Buttons Function
+	// Filter locations by tags when navbar buttons clicked
 	self.filterPlaces = function(type) {
 		infowindow.close();
 		self.visiblePlaces.removeAll();
@@ -270,6 +271,20 @@ var KoViewModel = function() {
 	        	place.marker.setVisible(true);
 	    	});
 		}
+	};
+
+	// Toggle 'active' class for filter buttons
+	self.selected = function() {
+		var selector = '.nav li';
+		var listSelector = 'div.list-group > button';
+	 	$(selector).on('click', function(){
+	        $(selector).removeClass('active');
+	    	$(this).addClass('active');
+	 	});
+		$(listSelector).on('click', function(){
+		    $(listSelector).removeClass('active');
+		    $(this).addClass('active');
+		});
 	};
 
 	// Reset the view when navbar header is clicked
@@ -290,38 +305,46 @@ var KoViewModel = function() {
 		google.maps.event.trigger(place.marker, 'click');
 	};
 
+
+
+
+	// *******************************
+	// *       AJAX REQUESTS         *
+	// *******************************
+
+
 	// Trigger Foursquare Ajax request
 	self.infoRequest = function(place) {
 		// reset error status
 		self.ajaxError(false);
 		self.infoError(false);
 
-		// Clear current URL and Phone
+		// Clear current url and phone number
 		self.venueUrl(null);
     	self.venuePhone(null);
 
         var venue = ko.observable();
         place.url = ko.observable(place.url);
         place.phone = ko.observable(place.phone);
-        var infoArray = ko.observableArray();
+        var infoArray = [];
 
         var foursquareUrl = 'https://api.foursquare.com/v2/venues/search?ll=' +place.lat()+ ',' +place.lng()+ '&intent=match&name='+place.name()+'&client_id=OXYOWWZSQILOKF21ZNLDZ0050FIJMRRBG0RPKSH2ZEEVUDEV&client_secret=UNWECJ2HMPBYHOWT4ZK0MK4ZDOFE5CRQYQIT514ZNU3V2DCP&v=20160519';
 
         $.getJSON(foursquareUrl, function(data) {
 	    	venue = data.response.venues[0];
 
-			if ((venue !=undefined) && (venue.hasOwnProperty('url'))) {
+			if ((venue !== undefined) && (venue.hasOwnProperty('url'))) {
 				self.venueUrl(venue.url);
 				infoArray.push(venue.url + '<br>');
 			}
-			if ((venue !=undefined) && (venue.hasOwnProperty('contact')) && (venue.contact.hasOwnProperty('formattedPhone'))) {
+			if ((venue !== undefined) && (venue.hasOwnProperty('contact')) && (venue.contact.hasOwnProperty('formattedPhone'))) {
 				self.venuePhone(venue.contact.formattedPhone);
 				infoArray.push(venue.contact.formattedPhone + '<br>');
 			}
 
-			infowindow.setContent('<h5>' + place.name() + '</h5><br>' + infoArray().join("") + '<h6>Address: </h6>' + place.address());
+			infowindow.setContent('<h5>' + place.name() + '</h5><br>' + infoArray.join("") + '<h6>Address: </h6>' + place.address());
 
-			if (infoArray = null) {
+			if (infoArray[0] === undefined) {
 				// Set content for when information not available
 				infowindow.setContent('<h5>' + place.name() + '</h5><br>' + '<h6>Address: </h6>' + place.address());
 				self.infoError(true);
@@ -386,18 +409,10 @@ $(document).click(function (event) {
     }
 });
 
-// Toggle 'active' class for filter buttons
-var selector = '.nav li, button.btn-group-justified';
-
-$(selector).on('click', function(){
-    $(selector).removeClass('active');
-    $(this).addClass('active');
-});
-
 // Change height of google map depending on screen size.
 $(window).resize(function() {
 	var h = $(window).height(),
-	    offsetTop = $(document.getElementsByClassName("navbar-default")).height(); // Calculate the top offset
+	    offsetTop = $(document.getElementsByClassName("navbar-default")).height();
 	$('#map').css('height', (h - offsetTop));
 	$('#map-view').css('height', (h - offsetTop));
 }).resize();

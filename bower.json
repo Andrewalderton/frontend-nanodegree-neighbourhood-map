@@ -10,16 +10,26 @@
   "private": true,
   "ignore": [
     "**/.*",
-    "node_modules",
+    "./node_modules",
     "bower_components",
+    "src/bower_components",
     "test",
     "tests"
   ],
+  "overrides": {
+    "bootstrap": {
+      "main": [
+        "**/bootstrap/dist/**",
+        "less/bootstrap.less",
+        "dist/js/bootstrap.js",
+        "**/**/*.{js, css}"
+      ]
+    }
+  },
   "dependencies": {
     "jquery": "^2.2.3",
     "knockout": "^3.4.0",
-    "normalize-css": "^4.1.1",
-    "animate.css": "^3.5.1",
-    "bootstrap": "^3.3.6"
+    "bootstrap": "^3.3.6",
+    "jquery-ui": "^1.11.4"
   }
 }

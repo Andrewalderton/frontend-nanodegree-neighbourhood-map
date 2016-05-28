@@ -1,98 +1,125 @@
-// Load plugins
-var gulp = require('gulp');
 
-var plugins = require('gulp-load-plugins')({
-  pattern: ['gulp-*', 'gulp.*', 'main-bower-files', '*'],
-  replaceString: /\bgulp[\-.]/
-});
+var gulp = require('gulp'),
+    uglify = require('gulp-uglify'),
+    minifycss = require('gulp-minify-css'),
+    imagemin = require('gulp-imagemin'),
+    plumber = require('gulp-plumber'),
+    minifyinline = require('gulp-minify-inline'),
+    copy = require('gulp-copy'),
+    htmlReplace = require('gulp-html-replace'),
+    concat = require('gulp-concat'),
+    rename = require('gulp-rename'),
+    del = require('del'),
+    minifyhtml = require('gulp-minify-html');
 
 var critical = require('critical').stream;
 
-// Define default source and destination folders
-var dest = 'dist/';
-var src = 'src/';
+var bowerSrc = ['bower_components/**(!sizzle)/dist/*.js', 'bower_components/jquery-ui/*.js', 'bower_components/bootstrap/dist/**/*.js', '!**/**/npm.*', '!**/**/*.slim.*', '!**/**/*.debug.*', '!**/**/*.min.*'];
 
-//Optimize Images
-gulp.task('images', function() {
-  return
-    gulp.src(src + 'img')
-    .pipe(plugins.cache(plugins.imagemin({ optimizationLevel: 5, progressive: true, interlaced: true })))
-    .pipe(gulp.dest(dest + 'img'))
-    .pipe(plugins.notify({ message: 'Images have been optimized' }))
+var bowerCss = ['bower_components/**(!sizzle)/dist/*.css', 'src/css/jquery-ui.css', 'bower_components/bootstrap/dist/**/*.css', '!bower_components/jquery-ui/**/**/jquery-ui.css', '!**/**/npm.*', '!**/**/*.slim.*', '!**/**/*.debug.*', '!**/**/*.min.*', '!**/**/bootstrap-theme.*'];
+
+// Copy Bower Components
+gulp.task('copy', function() {
+  return [
+    gulp.src(['bower_components/bootstrap/fonts/*'])
+    .pipe(copy('dist/fonts', {prefix: 3})),
+
+    gulp.src(bowerSrc)
+    .pipe(copy('src/js', {prefix: 4})),
+
+    gulp.src(bowerCss)
+    .pipe(copy('src/css', {prefix: 4}))
+  ]
 });
 
-// Move scripts to bottom of html pages
-// Generate & Inline Critical-path CSS for above the fold content
-// Minify html
-gulp.task('inline', function () {
-  return gulp.src('src/*.html')
-    //.pipe(plugins.htmlreplace({js: 'js/perfmatters.min.js'}))
-    .pipe(plugins.defer())
-    .pipe(critical({base: 'src/tmp', inline: true, minify: true, css: ['src/css/main.css'] }))
-    .pipe(plugins.htmlmin({collapseWhitespace: true}))
-    .pipe(plugins.rename({ suffix: '.min' }))
-    .pipe(gulp.dest(dest))
-    .pipe(plugins.notify({ message: 'CSS inlined and HTML minified' }))
+// HTML minifier
+gulp.task('mini-html', function() {
+  var opts = {
+    conditionals: true,
+    spare:true
+  };
 
+  return gulp.src('src/*.html')
+    .pipe(htmlReplace({js: 'js/vendor.min.js', js2: 'js/main.min.js', css: 'css/vendor.min.css', css2: 'css/main.min.css'}))
+    .pipe(critical({base: 'src/tmp', inline: true, minify: true, css: ['src/css/main.css'] }))
+    .pipe(minifyhtml(opts))
+    .pipe(plumber())
+    .pipe(gulp.dest('dist/'));
+});
+
+gulp.task('mini-inline', function() {
+  gulp.src('*.html')
+    .pipe(minifyinline())
+    .pipe(gulp.dest('dist'))
 });
 
 // Delete leftover temp files from 'critical' plugin
 gulp.task('del', function() {
-  plugins.del([ 'src/tmp/**', '!src/tmp' ])
+  del([ 'src/tmp/**', '!src/tmp' ])
 });
 
-gulp.task('css', function() {
-  var cssFiles = ['src/css/*.css'];
-  var bowerCSS = ['bower_components/**/*.css'];
-  return gulp.src(plugins.mainBowerFiles().concat(cssFiles))
-    .pipe(plugins.filter(bowerCSS))
-    .pipe(plugins.order([
-      'normalize.css',
-      '*'
-    ]))
-    .pipe(plugins.concat('main.css'))
-    .pipe(plugins.cleanCss({compatibility: 'ie8'}))
-    .pipe(plugins.rename({ suffix: '.min' }))
-    .pipe(gulp.dest('dist/css'))
-    .pipe(plugins.notify({ message: 'CSS minified' }))
+// JavaScript  minifier
+gulp.task('mini-js', function() {
+  [ gulp.src('src/js/main.js')
+      .pipe(plumber())
+      .pipe(uglify( {mangle: false}))
+      .pipe(rename({ suffix: '.min' }))
+      .pipe(gulp.dest('dist/js')),
+
+    gulp.src(bowerSrc)
+      .pipe(plumber())
+      .pipe(concat('vendor.min.js'))
+      .pipe(gulp.dest('dist/js'))
+      .pipe(uglify({mangle: false}))
+      .pipe(gulp.dest('dist/js'))
+  ]
 });
 
-// Minify JS
-gulp.task('scripts', function() {
-  var jsFiles = ['src/js/*'];
-  var bowerJS = ['bower_components/**/*.js'];
-  return gulp.src(plugins.mainBowerFiles().concat(jsFiles))
-    .pipe(plugins.filter(bowerJS))
-    .pipe(plugins.concat('main.js'))
-    .pipe(plugins.uglify())
-    .pipe(plugins.rename({ suffix: '.min' }))
-    .pipe(gulp.dest(dest + 'js'))
-    .pipe(plugins.notify({ message: 'JS minified' }))
+// CSS minifier
+gulp.task('mini-css', function() {
+  [ gulp.src('src/css/main.css')
+      .pipe(plumber())
+      .pipe(minifycss({compatibility: 'ie8'}))
+      .pipe(rename({ suffix: '.min' }))
+      .pipe(gulp.dest('dist/css')),
+
+    gulp.src(bowerCss)
+      .pipe(plumber())
+      .pipe(concat('vendor.min.css'))
+      .pipe(gulp.dest('dist/css'))
+      .pipe(minifycss({compatibility: 'ie8'}))
+      .pipe(gulp.dest('dist/css'))
+  ]
 });
 
-// Lint JS
-gulp.task('lint', function() {
-  return gulp.src(src + 'js/*.js')
-    .pipe(plugins.jshint())
-    .pipe(plugins.jshint.reporter('default'))
-    .pipe(plugins.notify({ message: 'JS lint complete' }))
+// Optimize Images
+gulp.task('optimize-image', function() {
+    gulp.src('src/img/*')
+        .pipe(imagemin({
+            progressive: true,
+            svgoPlugins: [{
+                removeViewBox: false
+            }],
+            use: [pngquant()]
+        }))
+        .pipe(gulp.dest('dist/img'));
 });
 
-//Browsersync
-gulp.task('browser-sync', function() {
-  plugins.browserSync.init({
-    server: {
-      baseDir: "./"
-    }
-  });
-});
+// Image compress
+gulp.task('compress-image', function() {
+  gulp.src('src/img/*')
+    .pipe(plumber())
+    .pipe(imagemin())
+    .pipe(gulp.dest('dist/img'));
+})
 
 // Watch Files For Changes
 gulp.task('watch', function() {
-  gulp.watch(src + 'js/*.js' ['lint', 'scripts']).on('change', plugins.browserSync.reload);
-  gulp.watch(src + 'css/*.css'['critical']).on('change', plugins.browserSync.reload);
-  gulp.watch(src + 'html/*.html' ['useref']).on('change', plugins.browserSync.reload);
+  gulp.watch('src/*.html', ['mini-html']);
+  gulp.watch('src/*.html', ['mini-inline']);
+  gulp.watch('src/js/*.js', ['mini-js']);
+  gulp.watch('src/css/*.css', ['mini-css']);
+  gulp.watch('src/img/*', ['optimize-image']);
 });
 
-// Default Task
-gulp.task('default', ['del', 'inline', 'scripts', 'css', 'images', 'lint', 'watch'] );
+gulp.task('default', ['del', 'copy', 'mini-html', 'mini-js', 'mini-css', 'compress-image', 'watch']);

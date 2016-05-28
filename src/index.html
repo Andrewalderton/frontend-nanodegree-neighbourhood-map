@@ -10,10 +10,15 @@
     <link rel="apple-touch-icon" href="apple-touch-icon.png">
     <!-- Place favicon.ico in the root directory -->
     <link href='https://fonts.googleapis.com/css?family=Montserrat:400,700' rel='stylesheet' type='text/css'>
-    <link rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap.min.css">
-    <link rel="stylesheet" href="css/jquery-ui.css">
-    <link rel="stylesheet" href="css/main.css">
 
+    <!-- build:css -->
+    <link rel="stylesheet" href="css/bootstrap.min.css">
+    <link rel="stylesheet" href="css/jquery-ui.css">
+    <!-- endbuild -->
+
+    <!-- build:css2 -->
+    <link rel="stylesheet" href="css/main.css">
+    <!-- endbuild -->
   </head>
   <body>
     <div class="container-fluid">
@@ -30,7 +35,7 @@
       </div>
 
       <div class="row no-gutter">
-        <div class="col-md-12" id="list-view">
+        <div class="col-sm-12" id="list-view">
           <nav class="navbar navbar-default">
             <div class="container">
               <div class="navbar-header">
@@ -49,9 +54,9 @@
               <div id="navbar" class="collapse navbar-collapse navbar-main">
 
                 <ul class="nav nav-pills nav-justified">
-                  <li><a href="#" data-bind="click: function() { filterPlaces('pubs') }">Pubs</a></li>
-                  <li><a href="#" data-bind="click: function() { filterPlaces('attractions')}">Attractions</a></li>
-                  <li><a href="#" data-bind="click: function() { filterPlaces('stations')}">Stations</a></li>
+                  <li><a href="#" data-bind="click: function() { filterPlaces('pubs'); selected() }">Pubs</a></li>
+                  <li><a href="#" data-bind="click: function() { filterPlaces('attractions'); selected() }">Attractions</a></li>
+                  <li><a href="#" data-bind="click: function() { filterPlaces('stations'); selected() }">Stations</a></li>
                 </ul>
 
               </div><!-- /.nav-collapse -->
@@ -61,14 +66,14 @@
       </div>
 
       <div class="row no-gutter">
-        <div class="col-md-8">
+        <div class="col-sm-8">
           <div id="map-view">
             <div id="map"></div>
           </div>
         </div>
-        <div class="col-md-4" id="list-view">
-          <div id="navbar" class="ui-widget">
-            <div class="input-group" for="filter">
+        <div class="col-sm-4">
+          <div class="ui-widget">
+            <div class="input-group">
               <input id="filter" type="text" class="form-control" placeholder="Search for..." data-bind="textInput: userInput, event: {keyup: filterMarkers}">
               <span class="input-group-btn" id="basic-addon1" aria-label="filter">
                 <button type="button" class="btn btn-default" aria-hidden="true" data-bind="click: filterInput">
@@ -78,7 +83,7 @@
             </div><!-- /input-group -->
 
             <div class="list-group" role="group" aria-label="..." data-bind="foreach: visiblePlaces">
-              <button type="button" class="list-group-item btn-group-justified" data-toggle="collapse" aria-expanded="false" data-bind="text: name,  attr: { 'data-target': '#collapseText' + id() }, click: function() { $parent.listClick(this); $parent.photoRequest(this) }"></button>
+              <button type="button" class="list-group-item btn-group-justified" data-toggle="collapse" aria-expanded="false" data-bind="text: name,  attr: { 'data-target': '#collapseText' + id() }, click: function() { $parent.listClick(this); $parent.photoRequest(this); $parent.selected() }"></button>
 
               <div class="collapse" data-bind="attr: { id: 'collapseText' + id() }">
                 <div class="well">
@@ -91,7 +96,7 @@
 
                   <span class="description" data-bind="html: $parent.visiblePhotos"></span>
                   <div data-bind="visible: $parent.infoError">
-                    <h5>Additional information not currently available for this location</h5>
+                    <p class="info-error">Additional information not currently available for this location.</p>
                   </div>
                   <div data-bind="visible: $parent.ajaxError">
                     <h5>Looks like there was a problem retrieving your data. Not all information may be available.</h5>
@@ -106,18 +111,22 @@
 
       <footer>
         <div class="row no-gutter">
-          <div class="col-md-12" id="footer-text">
+          <div class="col-sm-12" id="footer-text">
             <p>© 2016. All Rights Reserved.</p>
           </div>
         </div>
       </footer>
-
-        <script src="bower_components/jquery/dist/jquery.min.js"></script>
-        <script src="bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
-        <script src="bower_components/knockout/dist/knockout.js"></script>
-        <script src="js/jquery-ui.js"></script>
         <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCK6yfy3VmtcsIUB03GNa4Rc7w8Zjak57Y&callback=initMap" async defer></script>
+        <!-- build:js -->
+        <script src="js/jquery.js"></script>
+        <script src="js/bootstrap.js"></script>
+        <script src="js/knockout.js"></script>
+        <script src="js/jquery-ui.js"></script>
+        <!-- endbuild -->
+        <!-- build:js2 -->
         <script src="js/main.js"></script>
+        <!-- endbuild-->
+
     </div><!-- container -->
   </body>
 </html>

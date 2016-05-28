@@ -1,35 +1,23 @@
 
-h1 {
-	font-size: 16px;
-	font-family: 'Montserrat', sans-serif;
-	font-weight: 700;
-	color: #333;
+/* Main Styles */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+	font: 400 1em/1em 'Montserrat', sans-serif;
+	color: #fb5e8d;
 }
 
-html, body {
+html,
+body {
     height: 100%;
     margin: 0;
     padding: 0;
-    font-family: 'Montserrat', sans-serif;
-	font-weight: 400;
+    font: 400 0.9em 'Montserrat', sans-serif;
 	color: #333;
 	background-color: #f2f2f2;
-}
-
-ul {
-	list-style: none;
-	padding: 10px;
-}
-
-li > a {
-	margin: 20px 10px;
-
-}
-
-#map {
-	width: 100%;
-	min-height: 100%;
-	float: right;
 }
 
 #main-header {
@@ -39,11 +27,10 @@ li > a {
     width: 100%;
 	text-align: center;
 	margin: auto;
-	font-family: 'Montserrat', sans-serif;
-	font-weight: 700;
+	font: 700 1.5em 'Montserrat' , sans-serif;
 	color: #fb5e8d;
-	font-size: 150%;
 }
+
 
 /* Images */
 img {
@@ -65,35 +52,49 @@ img {
     padding: 0;
 }
 
-.no-gutter > [class*='col-'] {
-    padding-right:0;
-    padding-left:0;
+
+/* Google Map */
+#map {
+	width: 100%;
+	min-height: 100%;
+	float: right;
+	border-bottom: 2px solid #fb5e8d;
 }
 
-#footer-text {
+
+/* Footer */
+footer {
 	text-align: center;
 	padding: 10px;
 	margin-top: 50px;
 }
 
-#map {
-	border-bottom: 2px solid #fb5e8d;
+
+/* Navigation Styles */
+ul {
+	list-style: none;
+	padding: 10px;
 }
 
-.nav>li>a {
+li > a {
+	margin: 20px 10px;
+}
+
+.nav>li>a,
+.nav>li>a:hover {
 	background-color: #373737;
 	color: white;
 }
 
-.nav>li>a:hover {
-	color: white;
-}
-
-.nav-pills>li.active>a, .nav-pills>li.active>a:focus, .nav-pills>li.active>a:hover, .nav-pills>li>a:hover{
+.nav-pills>li.active>a,
+.nav-pills>li.active>a:focus,
+.nav-pills>li.active>a:hover,
+.nav-pills>li>a:hover{
 	background-color: #fb5e8d;
 }
 
-.navbar-brand, .nav > li > a.navbar-brand {
+.navbar-brand,
+.nav>li>a.navbar-brand {
 	margin: 0;
 	text-align: center;
 	background-color: transparent;
@@ -101,16 +102,8 @@ img {
 	margin-bottom: 20px;
 }
 
-.nav > li > a.navbar-brand:hover {
+a.navbar-brand:hover {
 	color: #fb5e8d;
-}
-
-.well {
-	margin: 0;
-}
-
-.description {
-	font-style: italic;
 }
 
 .navbar {
@@ -121,15 +114,36 @@ img {
 	height: 100%;
 }
 
+
+/* List-View Styles */
+.well {
+	margin: 0;
+}
+
+.description {
+	font-style: italic;
+}
+
+.info-error {
+	font-size: 0.75em;
+	text-align: center;
+}
+
 .ui-menu-item {
 	color: white;
 	background-color: #333;
 }
 
-.list-group-item.active, .list-group-item.active:focus, .list-group-item.active:hover{
+.list-group-item.active,
+.list-group-item.active:focus,
+.list-group-item.active:hover {
 	background-color: #333;
 	color: white;
 	outline: none;
 	border: none;
 }
 
+.no-gutter > [class*='col-'] {
+    padding-right:0;
+    padding-left:0;
+}
