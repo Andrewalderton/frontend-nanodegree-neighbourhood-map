@@ -300,8 +300,15 @@ var KoViewModel = function() {
 	    });
 	};
 
+	// Close previous list-view tab when another is selected
 	// Set markers to bounce when list-view items clicked
 	self.listClick = function(place) {
+		var clickover = $(place.target);
+	    var $navbar = $(".collapse");
+	    var _opened = $navbar.hasClass("in");
+	    if (_opened === true && !clickover.hasClass("navbar-toggle")) {
+	        $navbar.collapse('hide');
+	    }
 		google.maps.event.trigger(place.marker, 'click');
 	};
 
@@ -334,8 +341,8 @@ var KoViewModel = function() {
 	    	venue = data.response.venues[0];
 
 			if ((venue !== undefined) && (venue.hasOwnProperty('url'))) {
-				self.venueUrl(venue.url);
-				infoArray.push(venue.url + '<br>');
+				self.venueUrl('<a href="' + venue.url + '">' + venue.url + '</a>');
+				infoArray.push('<h6>Contact:</h6><a href="' + venue.url + '">' + venue.url + '</a><br>');
 			}
 			if ((venue !== undefined) && (venue.hasOwnProperty('contact')) && (venue.contact.hasOwnProperty('formattedPhone'))) {
 				self.venuePhone(venue.contact.formattedPhone);
@@ -398,16 +405,6 @@ ko.applyBindings(new KoViewModel());
 // *      OTHER FUNCTIONS        *
 // *******************************
 
-
-// Close previous list-view tab when another is selected
-$(document).click(function (event) {
-    var clickover = $(event.target);
-    var $navbar = $(".collapse");
-    var _opened = $navbar.hasClass("in");
-    if (_opened === true && !clickover.hasClass("navbar-toggle")) {
-        $navbar.collapse('hide');
-    }
-});
 
 // Change height of google map depending on screen size.
 $(window).resize(function() {

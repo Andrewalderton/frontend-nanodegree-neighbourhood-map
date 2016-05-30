@@ -4,31 +4,24 @@
     <meta charset="utf-8">
     <meta http-equiv="x-ua-compatible" content="ie=edge">
     <title>Neighbourhood Map</title>
-    <meta name="description" content="">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-
-    <link rel="apple-touch-icon" href="apple-touch-icon.png">
-    <!-- Place favicon.ico in the root directory -->
+    <link rel="icon" href="favicon.ico">
     <link href='https://fonts.googleapis.com/css?family=Montserrat:400,700' rel='stylesheet' type='text/css'>
-
     <!-- build:css -->
-    <link rel="stylesheet" href="css/bootstrap.min.css">
-    <link rel="stylesheet" href="css/jquery-ui.css">
+      <link rel="stylesheet" href="css/bootstrap.min.css">
+      <link rel="stylesheet" href="css/jquery-ui.css">
     <!-- endbuild -->
-
     <!-- build:css2 -->
-    <link rel="stylesheet" href="css/main.css">
+      <link rel="stylesheet" href="css/main.css">
     <!-- endbuild -->
   </head>
   <body>
     <div class="container-fluid">
       <div class="row no-gutter">
         <div class="col-xs-12">
-
-        <!--[if lt IE 8]>
+          <!--[if lt IE 8]>
             <p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
-        <![endif]-->
-
+          <![endif]-->
           <img class="main-img" src="img/landscapes-city-night-800.jpg" srcset="img/landscapes-city-night-400.jpg 400w, img/landscapes-city-night-800.jpg 800w, img/landscapes-city-night-1400.jpg 1400w" sizes="100vw" alt="city landscape at night">
           <a href="#list-view"><h1 id="main-header"><em>NEIGHBOURHOOD MAP</em></h1></a>
         </div>
@@ -91,7 +84,7 @@
                   <h6>DESCRIPTION</h6><span class="description" data-bind="text: info()"></span><hr>
 
                   <div data-bind="if: $parent.venueUrl, if: $parent.venuePhone"><h6>CONTACT</h6></div>
-                  <span class="description" data-bind="text: $parent.venueUrl"></span><br>
+                  <span class="description" data-bind="html: $parent.venueUrl"></span><br>
                   <span class="description" data-bind="text: $parent.venuePhone"></span><hr>
 
                   <span class="description" data-bind="html: $parent.visiblePhotos"></span>
