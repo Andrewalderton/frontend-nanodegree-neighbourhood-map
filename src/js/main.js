@@ -116,16 +116,26 @@ var places = [
 // *******************************
 
 
+var map;
 function initMap() {
+	// Map styling adapted from snazzymaps.com
+	var mapOptions = [{"featureType": "landscape", "stylers": [{"hue":"#FFBB00"}, { "saturation": 43.400000000000006 }, {"lightness": 37.599999999999994 }, {"gamma": 1 }]}, {"featureType": "road.highway", "stylers": [{ "hue": "#FFC200"}, {"saturation": -61.8}, {"lightness": 45.599999999999994}, {"gamma": 1}]}, {"featureType": "road.arterial","stylers":[{"hue": "#FF0300"}, {"saturation": -100}, {"lightness": 51.19999999999999}, {"gamma": 1}]}, {"featureType": "road.local","stylers":[{"hue": "#FF0300"}, {"saturation":-100}, {"lightness": 52}, {"gamma": 1}]}, {"featureType": "water", "stylers":[{"hue": "#0078FF"}, {"saturation": -13.200000000000003}, {"lightness": 2.4000000000000057}, {"gamma": 1}]}, {"featureType": "poi", "stylers":[{"hue": "#00FF6A"}, {"saturation": -1.0989010989011234}, {"lightness": 11.200000000000017}, {"gamma": 1}]}]
     // Create a map object and specify the DOM element for display.
-    var map = new google.maps.Map(document.getElementById('map'), {
+    map = new google.maps.Map(document.getElementById('map'), {
         center: {lat: 51.3517278, lng: -2.9497165},
         scrollwheel: false,
         zoom: 12,
-        mapTypeId: google.maps.MapTypeId.HYBRID
+        styles: mapOptions
     });
+  //  google.maps.event.addDomListener(map, 'resize', );
 
-	var infowindow = new google.maps.InfoWindow();
+	ko.applyBindings(new KoViewModel());
+}
+
+// Error handling function for Google Map
+function googleError() {
+	alert('Error: Your Google Map has failed to load');
+}
 
 
 
@@ -138,22 +148,34 @@ function initMap() {
 var KoViewModel = function() {
     var self = this;
 
+	// Animate the scroll when #main-header is clicked.
+	self.click = function() {
+		$('html, body').animate({
+        	scrollTop: $("#list-view").offset().top }, 'slow'
+        );
+	};
+
 	// Place Object
 	var Place = function(place) {
 		// Information taken from provided data model
-		this.id = ko.observable(place.id);
-		this.name = ko.observable(place.name);
-		this.address = ko.observable(place.address);
-		this.lat = ko.observable(place.lat);
-		this.lng = ko.observable(place.lng);
-		this.tags = ko.observableArray(place.tags);
-		this.info = ko.observable(place.info);
+		this.id = place.id;
+		this.name = place.name;
+		this.address = place.address;
+		this.lat = place.lat;
+		this.lng = place.lng;
+		this.tags = place.tags;
+		this.info = place.info;
 		this.latLng = {lat: place.lat, lng: place.lng};
-		this.marker = ko.observable(null);
 	};
+
+	var infowindow = new google.maps.InfoWindow();
+
+	self.activeClick = ko.observable();
+	self.collapsed = ko.observable(false);
 
 	self.venueUrl = ko.observable();
     self.venuePhone = ko.observable();
+    self.infoArray = ko.observableArray();
 
 	self.infoError = ko.observable(false);
 	self.ajaxError = ko.observable(false);
@@ -171,11 +193,11 @@ var KoViewModel = function() {
     self.allPlaces().forEach(function(place) {
 	    var markerOptions = {
 	      position: place.latLng,
-		  map: map,
+	      map : map,
 		  animation: google.maps.Animation.DROP
 	    };
 
-	    place.marker = new google.maps.Marker(markerOptions);
+	   place.marker = new google.maps.Marker(markerOptions);
 
 	    // Open infowindow and trigger marker animation when clicked.
 	    place.marker.addListener('click', function() {
@@ -184,6 +206,7 @@ var KoViewModel = function() {
 			setTimeout(function(){place.marker.setAnimation(null);}, 1450);
 			// Get data for the infowindow.
 			self.infoRequest(place);
+			self.photoRequest(place);
 		});
     });
 
@@ -199,7 +222,7 @@ var KoViewModel = function() {
 	// Create array of place names for use with autocomplete plugin.
 	var filterNames = [];
 	self.allPlaces().forEach(function(place) {
-		filterNames.push(place.name());
+		filterNames.push(place.name);
 	});
 
 	// Auto-complete jquery plugin
@@ -211,11 +234,11 @@ var KoViewModel = function() {
 	});
 
 	// Run the filterInput function when enter key is pressed.
-	window.addEventListener("keyup", checkKeyPressed, false);
-	function checkKeyPressed(e) {
-		if (e.keyCode == "13") {
+	self.enterKey = function(data, event) {
+		if (event.keyCode == "13") {
 			self.filterInput();
-		}
+		} else
+		self.filterMarkers();
 	}
 
 	// Function to run whenever 'enter' key pressed, or search icon is clicked.
@@ -234,14 +257,15 @@ var KoViewModel = function() {
 		// Clear current places from the view.
 	    self.visiblePlaces.removeAll();
 	    infowindow.close();
-	    $('.nav li').removeClass('active');
+	    self.collapsed(false);
+		self.activeClick(false);
 
 	    var searchInput = self.userInput().toLowerCase();
 
 	    // Look at place names and tags to determine if the user input matches.
 	    self.allPlaces().forEach(function(place) {
 	        place.marker.setVisible(false);
-	        if ((place.name().toLowerCase().indexOf(searchInput) !== -1) || (place.tags().indexOf(searchInput) !== -1)) {
+	        if ((place.name.toLowerCase().indexOf(searchInput) !== -1) || (place.tags.indexOf(searchInput) !== -1)) {
 	            self.visiblePlaces.push(place);
 	        }
 	    });
@@ -258,10 +282,12 @@ var KoViewModel = function() {
 	self.filterPlaces = function(type) {
 		infowindow.close();
 		self.visiblePlaces.removeAll();
+		self.collapsed(false);
+		self.activeClick(false);
 
 		self.allPlaces().forEach(function(place) {
 			place.marker.setVisible(false);
-			if (place.tags().indexOf(type) !== -1) {
+			if (place.tags.indexOf(type) !== -1) {
 				self.visiblePlaces.push(place);
 			}
 		});
@@ -274,23 +300,21 @@ var KoViewModel = function() {
 	};
 
 	// Toggle 'active' class for filter buttons
-	self.selected = function() {
-		var selector = '.nav li';
-		var listSelector = 'div.list-group > button';
-	 	$(selector).on('click', function(){
-	        $(selector).removeClass('active');
-	    	$(this).addClass('active');
-	 	});
-		$(listSelector).on('click', function(){
-		    $(listSelector).removeClass('active');
-		    $(this).addClass('active');
+	self.toggle = function(id) {
+		var el = document.getElementById(id);
+		var elementList = document.querySelectorAll('li');
+		elementList.forEach(function(element) {
+			element.classList.remove('active');
 		});
+		el.classList.add('active');
 	};
 
 	// Reset the view when navbar header is clicked
 	self.showAllPlaces = function() {
 		infowindow.close();
 		self.visiblePlaces.removeAll();
+		self.collapsed(false);
+		self.activeClick(false);
 
 		self.allPlaces().forEach(function(place) {
 	    	self.visiblePlaces.push(place);
@@ -300,16 +324,14 @@ var KoViewModel = function() {
 	    });
 	};
 
-	// Close previous list-view tab when another is selected
-	// Set markers to bounce when list-view items clicked
-	self.listClick = function(place) {
-		var clickover = $(place.target);
-	    var $navbar = $(".collapse");
-	    var _opened = $navbar.hasClass("in");
-	    if (_opened === true && !clickover.hasClass("navbar-toggle")) {
-	        $navbar.collapse('hide');
-	    }
-		google.maps.event.trigger(place.marker, 'click');
+    self.listClick = function(data) {
+    	google.maps.event.trigger(data.marker, 'click');
+
+        self.activeClick(data.id);
+		data.collapsed = ko.computed(function() {
+        	return (self.collapsed(false) ) ? 'collapse in' + self.activeClick() : 'collapsed' + self.activeClick() ;
+    	}, self);
+		self.collapsed(data.collapsed());
 	};
 
 
@@ -329,13 +351,14 @@ var KoViewModel = function() {
 		// Clear current url and phone number
 		self.venueUrl(null);
     	self.venuePhone(null);
+    	self.infoArray(null);
 
         var venue = ko.observable();
         place.url = ko.observable(place.url);
         place.phone = ko.observable(place.phone);
         var infoArray = [];
 
-        var foursquareUrl = 'https://api.foursquare.com/v2/venues/search?ll=' +place.lat()+ ',' +place.lng()+ '&intent=match&name='+place.name()+'&client_id=OXYOWWZSQILOKF21ZNLDZ0050FIJMRRBG0RPKSH2ZEEVUDEV&client_secret=UNWECJ2HMPBYHOWT4ZK0MK4ZDOFE5CRQYQIT514ZNU3V2DCP&v=20160519';
+        var foursquareUrl = 'https://api.foursquare.com/v2/venues/search?ll=' +place.lat+ ',' +place.lng+ '&intent=match&name='+place.name+'&client_id=OXYOWWZSQILOKF21ZNLDZ0050FIJMRRBG0RPKSH2ZEEVUDEV&client_secret=UNWECJ2HMPBYHOWT4ZK0MK4ZDOFE5CRQYQIT514ZNU3V2DCP&v=20160519';
 
         $.getJSON(foursquareUrl, function(data) {
 	    	venue = data.response.venues[0];
@@ -349,27 +372,33 @@ var KoViewModel = function() {
 				infoArray.push(venue.contact.formattedPhone + '<br>');
 			}
 
-			infowindow.setContent('<h5>' + place.name() + '</h5><br>' + infoArray.join("") + '<h6>Address: </h6>' + place.address());
-
 			if (infoArray[0] === undefined) {
 				// Set content for when information not available
-				infowindow.setContent('<h5>' + place.name() + '</h5><br>' + '<h6>Address: </h6>' + place.address());
+				self.infoArray('<h5>' + place.name + '</h5><br>' + '<h6>Address: </h6>' + place.address + '<br><p><br>Phone and Website information currently unavailable.</p>');
 				self.infoError(true);
+			} else {
+				self.infoArray('<h5>' + place.name + '</h5><br>' + infoArray.join("") + '<h6>Address: </h6>' + place.address);
 			}
+
 		}).fail(function() {
         	self.ajaxError(true);
-            infowindow.setContent('<h5>' + place.name() + '</h5><br>' + '<h6>Address: </h6>' + place.address());
+            self.infoArray('<h5>' + place.name + '</h5><br>' + '<h6>Address: </h6>' + place.address + '<br><p><br>Phone and Website information currently unavailable.</p>');
         });
 	};
 
 	// Flickr photo API request
 	self.photoRequest = function(place) {
+		place.apiTimeout = setTimeout(function() {
+	        self.ajaxError(true);
+	    }, 5000);
+
 		// reset error status
 		self.ajaxError(false);
 		self.visiblePhotos.removeAll();
 		var flickrKey = '153430b4e3a967170f237d09583ee9f1';
-	    var placeName = place.name();
+	    var placeName = place.name;
 	    var flickrAPI = 'https://api.flickr.com/services/rest/?method=flickr.photos.search';
+	    place.apiTimeout;
 
 	    $.getJSON(flickrAPI, {
 	        api_key: flickrKey,
@@ -381,64 +410,27 @@ var KoViewModel = function() {
 	        format: "json",
 	        nojsoncallback: 1
 	    }).done(function(data) {
+	    	if (data.photos.total != '0') {
+	    		clearTimeout(place.apiTimeout);
+	            var allPhotos = data.photos.photo;
 
-            var allPhotos = data.photos.photo;
+	            allPhotos.forEach(function(photo){
+	                // Build the url of the photo in order to link to it
+	     			self.flickrImg('<img src="http://farm' + photo.farm + '.static.flickr.com/' + photo.server + '/' + photo.id + '_' + photo.secret + '_z.jpg">');
+	  				self.visiblePhotos.push(self.flickrImg());
+	            });
+	            infowindow.setContent(self.infoArray() + '<br><br>' + self.visiblePhotos()[0]);
 
-            allPhotos.forEach(function(photo){
-                // Build the url of the photo in order to link to it
-     			self.flickrImg('<img src="http://farm' + photo.farm + '.static.flickr.com/' + photo.server + '/' + photo.id + '_' + photo.secret + '_z.jpg">');
-  				self.visiblePhotos.push(self.flickrImg());
-            });
+            } else {
+            	infowindow.setContent(self.infoArray() + '<p>No photos found for this location.</p>');
+            	clearTimeout(place.apiTimeout);
+        		self.ajaxError(true);
+        	}
         }).fail(function() {
         	self.ajaxError(true);
-            infowindow.setContent('<h5>' + place.name() + '</h5><br>' + '<h6>Address: </h6>' + place.address());
+            infowindow.setContent(self.infoArray() + '<p>No photos found for this location.</p>');
         });
 	};
+
 };
-
-ko.applyBindings(new KoViewModel());
-
-
-
-
-// *******************************
-// *      OTHER FUNCTIONS        *
-// *******************************
-
-
-// Change height of google map depending on screen size.
-$(window).resize(function() {
-	var h = $(window).height(),
-	    offsetTop = $(document.getElementsByClassName("navbar-default")).height();
-	$('#map').css('height', (h - offsetTop));
-	$('#map-view').css('height', (h - offsetTop));
-}).resize();
-}
-
-// Set height of 'main-img' to fit screen size.
-function imgHeight() {
-	$('.main-img').height($(window).height());
-	$('#map-view').height($(window).height());
-}
-imgHeight();
-
-// Smooth Scrolling - https://css-tricks.com/snippets/jquery/smooth-scrolling/
-$(function() {
-    $('a[href*="#"]:not([href="#"])').click(function() {
-        if (location.pathname.replace(/^\//,'') == this.pathname.replace(/^\//,'') && location.hostname == this.hostname) {
-            var target = $(this.hash);
-            target = target.length ? target : $('[name=' + this.hash.slice(1) +']');
-
-        if (target.length) {
-            $('html, body').animate({scrollTop: target.offset().top}, 1000);
-            return false;
-        }}
-    });
-});
-
-
-
-
-
-
 

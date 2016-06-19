@@ -8,7 +8,7 @@
     <link rel="icon" href="favicon.ico">
     <link href='https://fonts.googleapis.com/css?family=Montserrat:400,700' rel='stylesheet' type='text/css'>
     <!-- build:css -->
-      <link rel="stylesheet" href="css/bootstrap.min.css">
+      <link rel="stylesheet" href="css/bootstrap.css">
       <link rel="stylesheet" href="css/jquery-ui.css">
     <!-- endbuild -->
     <!-- build:css2 -->
@@ -22,8 +22,10 @@
           <!--[if lt IE 8]>
             <p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
           <![endif]-->
-          <img class="main-img" src="img/landscapes-city-night-800.jpg" srcset="img/landscapes-city-night-400.jpg 400w, img/landscapes-city-night-800.jpg 800w, img/landscapes-city-night-1400.jpg 1400w" sizes="100vw" alt="city landscape at night">
-          <a href="#list-view"><h1 id="main-header"><em>NEIGHBOURHOOD MAP</em></h1></a>
+          <img id="main-img" class="main-img" src="img/landscapes-city-night-800.jpg" srcset="img/landscapes-city-night-400.jpg 400w, img/landscapes-city-night-800.jpg 800w, img/landscapes-city-night-1400.jpg 1400w" sizes="100vw" alt="city landscape at night">
+          <a href="#" data-bind="click: function() { click() }">
+            <h1 class="main-header"><em>NEIGHBOURHOOD MAP</em><br><span class="main-icon glyphicon glyphicon-chevron-down"></span></h1>
+          </a>
         </div>
       </div>
 
@@ -47,9 +49,10 @@
               <div id="navbar" class="collapse navbar-collapse navbar-main">
 
                 <ul class="nav nav-pills nav-justified">
-                  <li><a href="#" data-bind="click: function() { filterPlaces('pubs'); selected() }">Pubs</a></li>
-                  <li><a href="#" data-bind="click: function() { filterPlaces('attractions'); selected() }">Attractions</a></li>
-                  <li><a href="#" data-bind="click: function() { filterPlaces('stations'); selected() }">Stations</a></li>
+                  <li id ="1" ><a href="#" data-bind="click: function() { filterPlaces('pubs'); toggle(1)}">Pubs</a></li>
+                  <li id="2"><a href="#" data-bind="click: function() { filterPlaces('attractions'); toggle(2)}">Attractions</a></li>
+                  <li id="3"><a href="#" data-bind="click: function() {  filterPlaces('stations'); toggle(3)}">Stations</a></li>
+                  <li id="4"><a href="#" data-bind="click: function() {  showAllPlaces(); toggle(4)}">Reset<span class="reset glyphicon glyphicon-map-marker"></span></a></li>
                 </ul>
 
               </div><!-- /.nav-collapse -->
@@ -60,14 +63,14 @@
 
       <div class="row no-gutter">
         <div class="col-sm-8">
-          <div id="map-view">
-            <div id="map"></div>
+          <div id="map-view" class="map-view">
+            <div id="map" class="map"></div>
           </div>
         </div>
         <div class="col-sm-4">
           <div class="ui-widget">
             <div class="input-group">
-              <input id="filter" type="text" class="form-control" placeholder="Search for..." data-bind="textInput: userInput, event: {keyup: filterMarkers}">
+              <input id="filter" type="text" class="form-control" placeholder="Search for..." data-bind="textInput: userInput, event: { keyup: enterKey }">
               <span class="input-group-btn" id="basic-addon1" aria-label="filter">
                 <button type="button" class="btn btn-default" aria-hidden="true" data-bind="click: filterInput">
                   <span class="glyphicon glyphicon-search"></span>
@@ -76,21 +79,20 @@
             </div><!-- /input-group -->
 
             <div class="list-group" role="group" aria-label="..." data-bind="foreach: visiblePlaces">
-              <button type="button" class="list-group-item btn-group-justified" data-toggle="collapse" aria-expanded="false" data-bind="text: name,  attr: { 'data-target': '#collapseText' + id() }, click: function() { $parent.listClick(this); $parent.photoRequest(this); $parent.selected() }"></button>
+              <button type="button" data-bind="text: name,  attr: { id: 'active'+id, class: 'collapse'+id + ' list-group-item btn-group-justified', 'aria-expanded': 'false', 'data-target': '#collapseText' + id }, click: function() { $parent.listClick(this); }, css: { 'active' : 'collapse in'+ id === $parent.collapsed()}"></button>
 
-              <div class="collapse" data-bind="attr: { id: 'collapseText' + id() }">
+              <div data-bind="attr: { id: 'collapseText' + id }, visible: 'collapse in' + id === $parent.collapsed()">
                 <div class="well">
-                  <h6>ADDRESS</h6><span class="description" data-bind="text: address()"></span><hr>
-                  <h6>DESCRIPTION</h6><span class="description" data-bind="text: info()"></span><hr>
+                  <h6>ADDRESS</h6><span class="description" data-bind="text: address"></span><hr>
+                  <h6>DESCRIPTION</h6><span class="description" data-bind="text: info"></span><hr>
 
                   <div data-bind="if: $parent.venueUrl, if: $parent.venuePhone"><h6>CONTACT</h6></div>
+                  <div data-bind="visible: $parent.infoError ">
+                    <p class="info-error">Contact information not currently available for this location.</p>
+                  </div>
                   <span class="description" data-bind="html: $parent.venueUrl"></span><br>
                   <span class="description" data-bind="text: $parent.venuePhone"></span><hr>
-
                   <span class="description" data-bind="html: $parent.visiblePhotos"></span>
-                  <div data-bind="visible: $parent.infoError">
-                    <p class="info-error">Additional information not currently available for this location.</p>
-                  </div>
                   <div data-bind="visible: $parent.ajaxError">
                     <h5>Looks like there was a problem retrieving your data. Not all information may be available.</h5>
                   </div>
@@ -109,7 +111,6 @@
           </div>
         </div>
       </footer>
-        <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCK6yfy3VmtcsIUB03GNa4Rc7w8Zjak57Y&callback=initMap" async defer></script>
         <!-- build:js -->
         <script src="js/jquery.js"></script>
         <script src="js/bootstrap.js"></script>
@@ -119,7 +120,7 @@
         <!-- build:js2 -->
         <script src="js/main.js"></script>
         <!-- endbuild-->
-
+        <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCK6yfy3VmtcsIUB03GNa4Rc7w8Zjak57Y&callback=initMap" async defer onerror="googleError()"></script>
     </div><!-- container -->
   </body>
 </html>
