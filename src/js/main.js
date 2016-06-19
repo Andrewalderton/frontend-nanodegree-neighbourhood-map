@@ -127,7 +127,6 @@ function initMap() {
         zoom: 12,
         styles: mapOptions
     });
-  //  google.maps.event.addDomListener(map, 'resize', );
 
 	ko.applyBindings(new KoViewModel());
 }
@@ -157,7 +156,7 @@ var KoViewModel = function() {
 
 	// Place Object
 	var Place = function(place) {
-		// Information taken from provided data model
+		// Information used from the provided data model.
 		this.id = place.id;
 		this.name = place.name;
 		this.address = place.address;
@@ -181,6 +180,7 @@ var KoViewModel = function() {
 	self.ajaxError = ko.observable(false);
 	self.visiblePhotos = ko.observableArray();
 	self.flickrImg = ko.observable();
+	self.ownerId = ko.observable();
 
 	// Create observable array to hold each place from the data model.
     self.allPlaces = ko.observableArray();
@@ -205,6 +205,7 @@ var KoViewModel = function() {
 		 	place.marker.setAnimation(google.maps.Animation.BOUNCE);
 			setTimeout(function(){place.marker.setAnimation(null);}, 1450);
 			// Get data for the infowindow.
+			self.listClick(place);
 			self.infoRequest(place);
 			self.photoRequest(place);
 		});
@@ -225,7 +226,7 @@ var KoViewModel = function() {
 		filterNames.push(place.name);
 	});
 
-	// Auto-complete jquery plugin
+	// Auto-complete jquery plugin.
 	$(function() {
 		$( "#filter" ).autocomplete({
 		    source: filterNames,
@@ -237,14 +238,15 @@ var KoViewModel = function() {
 	self.enterKey = function(data, event) {
 		if (event.keyCode == "13") {
 			self.filterInput();
-		} else
+		} else {
 		self.filterMarkers();
-	}
+		}
+	};
 
 	// Function to run whenever 'enter' key pressed, or search icon is clicked.
 	self.filterInput = function() {
 		// Update the userInput, as the input binding does not
-		//recognise when an autocomplete suggestion is clicked.
+		// recognise when an autocomplete suggestion is clicked.
 		var filterInput = $('#filter').val();
 		self.userInput(filterInput);
 		self.filterMarkers();
@@ -270,7 +272,7 @@ var KoViewModel = function() {
 	        }
 	    });
 
-	    // Set any matching markers to appear on the map
+	    // Set any matching markers to appear on the map.
 	    if (self.visiblePlaces().length > 0) {
 	    	self.visiblePlaces().forEach(function(place) {
 	        	place.marker.setVisible(true);
@@ -278,7 +280,7 @@ var KoViewModel = function() {
 		}
 	};
 
-	// Filter locations by tags when navbar buttons clicked
+	// Filter locations by tags when navbar buttons clicked.
 	self.filterPlaces = function(type) {
 		infowindow.close();
 		self.visiblePlaces.removeAll();
@@ -299,7 +301,7 @@ var KoViewModel = function() {
 		}
 	};
 
-	// Toggle 'active' class for filter buttons
+	// Toggle 'active' class for filter buttons.
 	self.toggle = function(id) {
 		var el = document.getElementById(id);
 		var elementList = document.querySelectorAll('li');
@@ -309,7 +311,7 @@ var KoViewModel = function() {
 		el.classList.add('active');
 	};
 
-	// Reset the view when navbar header is clicked
+	// Reset the view when reset button or navbar header are clicked.
 	self.showAllPlaces = function() {
 		infowindow.close();
 		self.visiblePlaces.removeAll();
@@ -324,9 +326,13 @@ var KoViewModel = function() {
 	    });
 	};
 
-    self.listClick = function(data) {
+	// Activate infowindow when list item is clicked.
+	self.markerTrigger = function(data) {
     	google.maps.event.trigger(data.marker, 'click');
+	};
 
+	// Toggle visibility of list item information when a marker is clicked.
+    self.listClick = function(data) {
         self.activeClick(data.id);
 		data.collapsed = ko.computed(function() {
         	return (self.collapsed(false) ) ? 'collapse in' + self.activeClick() : 'collapsed' + self.activeClick() ;
@@ -342,13 +348,13 @@ var KoViewModel = function() {
 	// *******************************
 
 
-	// Trigger Foursquare Ajax request
+	// Trigger Foursquare Ajax request.
 	self.infoRequest = function(place) {
 		// reset error status
 		self.ajaxError(false);
 		self.infoError(false);
 
-		// Clear current url and phone number
+		// Clear current url and phone number.
 		self.venueUrl(null);
     	self.venuePhone(null);
     	self.infoArray(null);
@@ -373,28 +379,29 @@ var KoViewModel = function() {
 			}
 
 			if (infoArray[0] === undefined) {
-				// Set content for when information not available
-				self.infoArray('<h5>' + place.name + '</h5><br>' + '<h6>Address: </h6>' + place.address + '<br><p><br>Phone and Website information currently unavailable.</p>');
+				// Set content for when information not available.
+				self.infoArray('<h5>' + place.name + '</h5><br>' + '<h6>Address: </h6>' + place.address + '<br><p class="info-error"><br>Phone and Website information currently unavailable.</p>');
 				self.infoError(true);
 			} else {
-				self.infoArray('<h5>' + place.name + '</h5><br>' + infoArray.join("") + '<h6>Address: </h6>' + place.address);
+				self.infoArray('<h5>' + place.name + '</h5><br>' + infoArray.join("") + '<p class="info-error"><em>provided by Foursquare</em></p><h6>Address: </h6>' + place.address);
 			}
 
 		}).fail(function() {
         	self.ajaxError(true);
-            self.infoArray('<h5>' + place.name + '</h5><br>' + '<h6>Address: </h6>' + place.address + '<br><p><br>Phone and Website information currently unavailable.</p>');
+            self.infoArray('<h5>' + place.name + '</h5><br>' + '<h6>Address: </h6>' + place.address + '<br><p class="info-error"><br>Phone and Website information currently unavailable.</p>');
         });
 	};
 
-	// Flickr photo API request
+	// Flickr photo API request.
 	self.photoRequest = function(place) {
 		place.apiTimeout = setTimeout(function() {
 	        self.ajaxError(true);
 	    }, 5000);
 
-		// reset error status
+		// Reset error status.
 		self.ajaxError(false);
-		self.visiblePhotos.removeAll();
+		self.visiblePhotos(null);
+		var photoArray = [];
 		var flickrKey = '153430b4e3a967170f237d09583ee9f1';
 	    var placeName = place.name;
 	    var flickrAPI = 'https://api.flickr.com/services/rest/?method=flickr.photos.search';
@@ -415,22 +422,26 @@ var KoViewModel = function() {
 	            var allPhotos = data.photos.photo;
 
 	            allPhotos.forEach(function(photo){
-	                // Build the url of the photo in order to link to it
-	     			self.flickrImg('<img src="http://farm' + photo.farm + '.static.flickr.com/' + photo.server + '/' + photo.id + '_' + photo.secret + '_z.jpg">');
-	  				self.visiblePhotos.push(self.flickrImg());
+	                // Build the url of the photo in order to link to it.
+	     			self.flickrImg('src="http://farm' + photo.farm + '.static.flickr.com/' + photo.server + '/' + photo.id + '_' + photo.secret + '_z.jpg">');
+	  				photoArray.push('<img ' + self.flickrImg());
+	  				// Get the user ID to be used for flickr attribution.
+	  				self.ownerId('<br><em><p class="info-error">flickr photo from <a  href="http://www.flickr.com/photos/' + photo.owner + '">flickr.com/photos/' + photo.owner + '</a></p></em>');
+	  				photoArray.push(self.ownerId());
+	  				self.visiblePhotos(photoArray.join(""));
 	            });
-	            infowindow.setContent(self.infoArray() + '<br><br>' + self.visiblePhotos()[0]);
+	            // Set infowindow content.
+	            infowindow.setContent(self.infoArray() + '<br><br>' + '<img class="window-img" ' + photoArray[0] + photoArray[1]);
 
             } else {
-            	infowindow.setContent(self.infoArray() + '<p>No photos found for this location.</p>');
+            	infowindow.setContent(self.infoArray() + '<p class="info-error">No photos found for this location.</p>');
             	clearTimeout(place.apiTimeout);
         		self.ajaxError(true);
         	}
         }).fail(function() {
         	self.ajaxError(true);
-            infowindow.setContent(self.infoArray() + '<p>No photos found for this location.</p>');
+            infowindow.setContent(self.infoArray() + '<p class="info-error">No photos found for this location.</p>');
         });
 	};
-
 };
 

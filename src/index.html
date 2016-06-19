@@ -79,19 +79,22 @@
             </div><!-- /input-group -->
 
             <div class="list-group" role="group" aria-label="..." data-bind="foreach: visiblePlaces">
-              <button type="button" data-bind="text: name,  attr: { id: 'active'+id, class: 'collapse'+id + ' list-group-item btn-group-justified', 'aria-expanded': 'false', 'data-target': '#collapseText' + id }, click: function() { $parent.listClick(this); }, css: { 'active' : 'collapse in'+ id === $parent.collapsed()}"></button>
+              <button type="button" data-bind="text: name,  attr: { id: 'active'+id, class: 'collapse'+id + ' list-group-item btn-group-justified', 'aria-expanded': 'false', 'data-target': '#collapseText' + id }, click: function() { $parent.markerTrigger(this); }, css: { 'active' : 'collapse in'+ id === $parent.collapsed()}"></button>
 
               <div data-bind="attr: { id: 'collapseText' + id }, visible: 'collapse in' + id === $parent.collapsed()">
                 <div class="well">
                   <h6>ADDRESS</h6><span class="description" data-bind="text: address"></span><hr>
                   <h6>DESCRIPTION</h6><span class="description" data-bind="text: info"></span><hr>
 
-                  <div data-bind="if: $parent.venueUrl, if: $parent.venuePhone"><h6>CONTACT</h6></div>
+                  <div data-bind="if: $parent.venueUrl, if: $parent.venuePhone">
+                    <h6>CONTACT</h6>
+                    <span class="description" data-bind="html: $parent.venueUrl"></span><br>
+                    <span class="description" data-bind="text: $parent.venuePhone"></span>
+                    <p class="info-error"><br><em>provided by Foursquare</em></p><hr>
+                  </div>
                   <div data-bind="visible: $parent.infoError ">
                     <p class="info-error">Contact information not currently available for this location.</p>
                   </div>
-                  <span class="description" data-bind="html: $parent.venueUrl"></span><br>
-                  <span class="description" data-bind="text: $parent.venuePhone"></span><hr>
                   <span class="description" data-bind="html: $parent.visiblePhotos"></span>
                   <div data-bind="visible: $parent.ajaxError">
                     <h5>Looks like there was a problem retrieving your data. Not all information may be available.</h5>
