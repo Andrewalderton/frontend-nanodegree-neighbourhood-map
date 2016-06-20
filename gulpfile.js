@@ -22,13 +22,24 @@ var bowerCss = ['bower_components/**(!sizzle)/dist/*.css', 'src/css/jquery-ui.cs
 gulp.task('copy', function() {
   return [
     gulp.src(['bower_components/bootstrap/fonts/*'])
-    .pipe(copy('dist/fonts', {prefix: 3})),
+    .pipe(copy('src/fonts', {prefix: 3})),
 
     gulp.src(bowerSrc)
     .pipe(copy('src/js', {prefix: 4})),
 
     gulp.src(bowerCss)
     .pipe(copy('src/css', {prefix: 4}))
+  ]
+});
+
+// Copy to 'dist' folder
+gulp. task('distCopy', function() {
+  return [
+    gulp.src('src/favicon.ico')
+    .pipe(copy('dist', {prefix: 1})),
+
+    gulp.src('src/fonts/*')
+    .pipe(copy('dist/fonts', {prefix: 2}))
   ]
 });
 
@@ -122,4 +133,4 @@ gulp.task('watch', function() {
   gulp.watch('src/img/*', ['optimize-image']);
 });
 
-gulp.task('default', ['del', 'copy', 'mini-html', 'mini-js', 'mini-css', 'compress-image', 'watch']);
+gulp.task('default', ['del', 'distCopy', 'mini-html', 'mini-js', 'mini-css', 'compress-image', 'watch']);
