@@ -33,7 +33,7 @@ gulp.task('copy', function() {
 });
 
 // Copy to 'dist' folder
-gulp. task('distCopy', function() {
+gulp.task('distCopy', function() {
   return [
     gulp.src('src/favicon.ico')
     .pipe(copy('dist', {prefix: 1})),

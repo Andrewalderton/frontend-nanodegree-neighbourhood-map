@@ -197,7 +197,7 @@ var KoViewModel = function() {
 		  animation: google.maps.Animation.DROP
 	    };
 
-	   place.marker = new google.maps.Marker(markerOptions);
+	    place.marker = new google.maps.Marker(markerOptions);
 
 	    // Open infowindow and trigger marker animation when clicked.
 	    place.marker.addListener('click', function() {
@@ -228,105 +228,55 @@ var KoViewModel = function() {
 
 	// Auto-complete jquery plugin.
 	$(function() {
-		$( "#filter" ).autocomplete({
-		    source: filterNames,
-		    autoFocus: true,
-		});
-	});
-
-	// Run the filterInput function when enter key is pressed.
-	self.enterKey = function(data, event) {
-		if (event.keyCode == "13") {
-			self.filterInput();
-		} else {
-		self.filterMarkers();
-		}
-	};
-
-	// Function to run whenever 'enter' key pressed, or search icon is clicked.
-	self.filterInput = function() {
-		// Update the userInput, as the input binding does not
-		// recognise when an autocomplete suggestion is clicked.
-		var filterInput = $('#filter').val();
-		self.userInput(filterInput);
-		self.filterMarkers();
-		// Clear the search bar after list-view and markers have been filtered.
-		self.userInput(undefined);
-	};
-
-	// Check user input string against place names and tags.
-	self.filterMarkers = function() {
-		// Clear current places from the view.
-	    self.visiblePlaces.removeAll();
-	    infowindow.close();
-	    self.collapsed(false);
-		self.activeClick(false);
-
-	    var searchInput = self.userInput().toLowerCase();
-
-	    // Look at place names and tags to determine if the user input matches.
-	    self.allPlaces().forEach(function(place) {
-	        place.marker.setVisible(false);
-	        if ((place.name.toLowerCase().indexOf(searchInput) !== -1) || (place.tags.indexOf(searchInput) !== -1)) {
-	            self.visiblePlaces.push(place);
+	    $( "#filter" ).autocomplete({
+	        source: filterNames,
+	        autoFocus: true,
+	        select: function( e, ui ) {
+	            self.userInput(ui.item.value)
 	        }
 	    });
+	});
 
-	    // Set any matching markers to appear on the map.
-	    if (self.visiblePlaces().length > 0) {
-	    	self.visiblePlaces().forEach(function(place) {
+	// Filter locations by name and tags depending on the user input.
+	self.filteredList = ko.computed(function() {
+	    if (self.userInput()) {
+	    	var searchInput = self.userInput().toLowerCase();
+	    }
+	    if (!self.userInput()) {
+	        return ko.utils.arrayFilter(self.allPlaces(), function(place) {
 	        	place.marker.setVisible(true);
-	    	});
-		}
-	};
-
-	// Filter locations by tags when navbar buttons clicked.
-	self.filterPlaces = function(type) {
-		infowindow.close();
-		self.visiblePlaces.removeAll();
-		self.collapsed(false);
-		self.activeClick(false);
-
-		self.allPlaces().forEach(function(place) {
-			place.marker.setVisible(false);
-			if (place.tags.indexOf(type) !== -1) {
-				self.visiblePlaces.push(place);
-			}
-		});
-
-		if (self.visiblePlaces().length > 0) {
-	    	self.visiblePlaces().forEach(function(place) {
-	        	place.marker.setVisible(true);
-	    	});
-		}
-	};
+	        	return place.name;
+	        });
+	    } else {
+	        return ko.utils.arrayFilter(self.visiblePlaces(), function(place) {
+	        	place.marker.setVisible(false);
+	        	infowindow.close();
+	    		self.collapsed(false);
+		    	self.activeClick(false);
+		    	self.toggle();
+	            if ((place.name.toLowerCase().indexOf(searchInput) !== -1) || (place.tags.indexOf(searchInput) !== -1)) {
+	            	place.marker.setVisible(true);
+	            	return place.name;
+	        	}
+	        });
+	    }
+	}, self);
 
 	// Toggle 'active' class for filter buttons.
 	self.toggle = function(id) {
+		infowindow.close();
+		self.collapsed(false);
 		var el = document.getElementById(id);
 		var elementList = document.querySelectorAll('li');
 		elementList.forEach(function(element) {
 			element.classList.remove('active');
 		});
-		el.classList.add('active');
+		if (el) {
+			el.classList.add('active');
+		}
 	};
 
-	// Reset the view when reset button or navbar header are clicked.
-	self.showAllPlaces = function() {
-		infowindow.close();
-		self.visiblePlaces.removeAll();
-		self.collapsed(false);
-		self.activeClick(false);
-
-		self.allPlaces().forEach(function(place) {
-	    	self.visiblePlaces.push(place);
-		});
-		self.visiblePlaces().forEach(function(place) {
-	        place.marker.setVisible(true);
-	    });
-	};
-
-	// Activate infowindow when list item is clicked.
+	// Open infowindow when list item is clicked.
 	self.markerTrigger = function(data) {
     	google.maps.event.trigger(data.marker, 'click');
 	};

@@ -81,6 +81,7 @@ img {
 	height: calc(100vh - 90px);
 	float: right;
 	border-bottom: 2px solid #fb5e8d;
+	z-index: 1;
 }
 
 /* Footer */
@@ -161,6 +162,15 @@ li>a.active {
 }
 
 /* List-View Styles */
+.basic-addon1 > span,
+.basic-addon1 > span:active,
+.basic-addon1 > span:hover {
+	cursor: default;
+	background-color: #f2f2f2;
+	box-shadow: none;
+	border-color: #ddd;
+}
+
 .well {
 	margin: 0;
 }

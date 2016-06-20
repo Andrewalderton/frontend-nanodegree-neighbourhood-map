@@ -7,14 +7,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="icon" href="favicon.ico">
     <link href='https://fonts.googleapis.com/css?family=Montserrat:400,700' rel='stylesheet' type='text/css'>
-    <!-- build:css -->
-      <link rel="stylesheet" href="css/bootstrap.css">
-      <link rel="stylesheet" href="css/jquery-ui.css">
-    <!-- endbuild -->
-    <!-- build:css2 -->
-      <link rel="stylesheet" href="css/main.css">
-    <!-- endbuild -->
-  </head>
+    <link rel="stylesheet" href="css/vendor.min.css">
+    <link rel="stylesheet" href="css/main.min.css">  </head>
   <body>
     <div class="container-fluid">
       <div class="row no-gutter">
@@ -49,9 +43,9 @@
               <div id="navbar" class="collapse navbar-collapse navbar-main">
 
                 <ul class="nav nav-pills nav-justified">
-                  <li id="1"><a href="#" data-bind="click: function() { userInput('Pubs'); toggle(1)}">Pubs</a></li>
-                  <li id="2"><a href="#" data-bind="click: function() { userInput('Attractions'); toggle(2)}">Attractions</a></li>
-                  <li id="3"><a href="#" data-bind="click: function() { userInput('Stations'); toggle(3)}">Stations</a></li>
+                  <li id="1"><a href="#" data-bind="click: function() { userInput('pubs'); toggle(1)}">Pubs</a></li>
+                  <li id="2"><a href="#" data-bind="click: function() { userInput('attractions'); toggle(2)}">Attractions</a></li>
+                  <li id="3"><a href="#" data-bind="click: function() { userInput('stations'); toggle(3)}">Stations</a></li>
                   <li id="4"><a href="#" data-bind="click: function() { userInput(''); toggle(4)}">Reset<span class="reset glyphicon glyphicon-map-marker"></span></a></li>
                 </ul>
 
@@ -114,16 +108,8 @@
           </div>
         </div>
       </footer>
-        <!-- build:js -->
-        <script src="js/jquery.js"></script>
-        <script src="js/bootstrap.js"></script>
-        <script src="js/knockout.js"></script>
-        <script src="js/jquery-ui.js"></script>
-        <!-- endbuild -->
-        <!-- build:js2 -->
-        <script src="js/main.js"></script>
-        <!-- endbuild-->
-        <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCK6yfy3VmtcsIUB03GNa4Rc7w8Zjak57Y&callback=initMap" async defer onerror="googleError()"></script>
+        <script src="js/vendor.min.js"></script>
+        <script src="js/main.min.js"></script>        <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCK6yfy3VmtcsIUB03GNa4Rc7w8Zjak57Y&callback=initMap" async defer onerror="googleError()"></script>
     </div><!-- container -->
   </body>
 </html>
