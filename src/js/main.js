@@ -405,7 +405,6 @@ var KoViewModel = function() {
 		var flickrKey = '153430b4e3a967170f237d09583ee9f1';
 	    var placeName = place.name;
 	    var flickrAPI = 'https://api.flickr.com/services/rest/?method=flickr.photos.search';
-	    place.apiTimeout;
 
 	    $.getJSON(flickrAPI, {
 	        api_key: flickrKey,
