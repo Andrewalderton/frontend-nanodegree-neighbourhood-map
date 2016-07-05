@@ -157,4 +157,4 @@ gulp.task('watch', function() {
   gulp.watch('src/img/*', ['optimize-image']);
 });
 
-gulp.task('default', ['del', 'distCopy', 'mini-html', 'mini-js', 'mini-css', 'compress-image', 'lint', 'watch']);
+gulp.task('default', ['del', 'distCopy', 'mini-html', 'mini-js', 'mini-css', 'compress-image', 'watch']);
