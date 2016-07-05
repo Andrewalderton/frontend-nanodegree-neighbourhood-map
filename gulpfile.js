@@ -10,6 +10,9 @@ var gulp = require('gulp'),
     concat = require('gulp-concat'),
     rename = require('gulp-rename'),
     del = require('del'),
+    jshint = require('gulp-jshint'),
+    csslint = require('gulp-csslint'),
+    html5Lint = require('gulp-html5-lint'),
     minifyhtml = require('gulp-minify-html');
 
 var critical = require('critical').stream;
@@ -122,7 +125,28 @@ gulp.task('compress-image', function() {
     .pipe(plumber())
     .pipe(imagemin())
     .pipe(gulp.dest('dist/img'));
-})
+});
+
+// Lint JS
+gulp.task('lint', function() {
+  return gulp.src('src/js/*.js')
+    .pipe(jshint())
+    .pipe(jshint.reporter('default'))
+    .pipe(notify({ message: 'JS lint complete' }));
+});
+
+// Lint CSS
+gulp.task('css', function() {
+  gulp.src('src/css/*.css')
+    .pipe(csslint())
+    .pipe(csslint.reporter());
+});
+
+// Lint HTML
+gulp.task('html-lint', function() {
+    return gulp.src('src/*.html')
+        .pipe(html5Lint());
+});
 
 // Watch Files For Changes
 gulp.task('watch', function() {
@@ -133,4 +157,4 @@ gulp.task('watch', function() {
   gulp.watch('src/img/*', ['optimize-image']);
 });
 
-gulp.task('default', ['del', 'distCopy', 'mini-html', 'mini-js', 'mini-css', 'compress-image', 'watch']);
+gulp.task('default', ['del', 'distCopy', 'mini-html', 'mini-js', 'mini-css', 'compress-image', 'lint', 'watch']);

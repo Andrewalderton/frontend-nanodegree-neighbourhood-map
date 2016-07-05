@@ -45,7 +45,6 @@ body {
 }
 
 .main-icon {
-	vertical-align: center;
 	padding-top: 1.5em;
 }
 
@@ -214,6 +213,6 @@ li>a.active {
 	background-color: #fb5e8d;
 }
 
-span.ui-helper-hidden-accessible {
+.ui-helper-hidden-accessible {
 	display: none;
 }
