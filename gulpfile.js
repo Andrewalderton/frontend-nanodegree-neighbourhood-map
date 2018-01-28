@@ -1,10 +1,9 @@
 
 const gulp = require('gulp'),
     uglify = require('gulp-uglify'),
-    minifycss = require('gulp-minify-css'),
+    minifycss = require('gulp-clean-css'),
     imagemin = require('gulp-imagemin'),
     plumber = require('gulp-plumber'),
-    minifyinline = require('gulp-minify-inline'),
     copy = require('gulp-copy'),
     htmlReplace = require('gulp-html-replace'),
     concat = require('gulp-concat'),
@@ -16,18 +15,27 @@ const gulp = require('gulp'),
     buffer = require('vinyl-buffer'),
     sourcemaps = require('gulp-sourcemaps'),
     log = require('gulplog'),
+    babel = require('gulp-babel'),
     browserSync = require('browser-sync').create();
 
 const critical = require('critical').stream;
 
-const yarnSrc = ['src/js/jquery.js', 'src/js/bootstrap.js'];
-const yarnCss = ['src/css/bootstrap.css'];
+const jsFiles = ['src/js/main.js', 'src/js/map.js', 'src/js/model.js', 'src/js/requests.js'];
+const yarnSrc = ['src/js/jquery.min.js', 'src/js/bootstrap.bundle.min.js', 'src/js/jquery-ui.min.js', 'src/js/knockout-latest.js'];
+const yarnCss = ['src/css/bootstrap.min.css', 'src/css/jquery-ui.min.css'];
 
-// JavaScript  minifier
+// JavaScript minifier
 gulp.task('mini-js', function(done) {
   [ gulp.src(yarnSrc)
       .pipe(plumber())
       .pipe(concat('vendor.min.js'))
+      .pipe(gulp.dest('dist/js'))
+      .pipe(uglify({mangle: false}))
+      .pipe(gulp.dest('dist/js')),
+
+    gulp.src(jsFiles)
+      .pipe(plumber())
+      .pipe(concat('main.min.js'))
       .pipe(gulp.dest('dist/js'))
       .pipe(uglify({mangle: false}))
       .pipe(gulp.dest('dist/js')),
@@ -65,16 +73,16 @@ gulp.task('uglify', function(done) {
 // Copy Yarn Packages
 gulp.task('copy', function(done) {
   return [
-    gulp.src(['node_modules/bootstrap/fonts/*'])
-    .pipe(copy('src/fonts', {prefix: 3})),
+    // gulp.src(['node_modules/bootstrap/fonts/*'])
+    // .pipe(copy('src/fonts', {prefix: 3})),
 
-    gulp.src('node_modules/jquery/dist/jquery.js')
+    gulp.src(['node_modules/jquery/dist/jquery.min.js', 'node_modules/bootstrap/dist/js/bootstrap.bundle.min.js'])
     .pipe(copy('src/js', {prefix: 4})),
 
-    gulp.src('node_modules/bootstrap/dist/js/bootstrap.js')
+    gulp.src('node_modules/knockout/build/output/knockout-latest.js')
     .pipe(copy('src/js', {prefix: 4})),
 
-    gulp.src('node_modules/bootstrap/dist/css/bootstrap.css')
+    gulp.src('node_modules/bootstrap/dist/css/bootstrap.min.css')
     .pipe(copy('src/css', {prefix: 4})),
     done()
   ];
@@ -95,19 +103,12 @@ gulp.task('distCopy', function(done) {
 // HTML minifier
 gulp.task('mini-html', function(done) {
   gulp.src('src/*.html')
-  .pipe(htmlReplace({js2: 'js/main.min.js', css2: 'css/main.min.css'}))
-  .pipe(critical({base: 'src/tmp', inline: true, minify: true, css: ['src/css/main.css'] }))
+  .pipe(htmlReplace({js: 'js/vendor.min.js', js2: 'js/main.min.js', css: 'css/vendor.min.css', css2: 'css/main.min.css'}))
+  //.pipe(critical({base: 'src/tmp', inline: true, minify: true, css: ['src/css/main.css'] }))
   .pipe(minifyhtml({collapseWhitespace: true}))
   .pipe(plumber())
   .pipe(gulp.dest('dist/'));
   done();
-});
-
-gulp.task('mini-inline', function(done) {
-  gulp.src('*.html')
-    .pipe(minifyinline())
-    .pipe(gulp.dest('dist'));
-    done();
 });
 
 // Delete leftover temp files from 'critical' plugin
