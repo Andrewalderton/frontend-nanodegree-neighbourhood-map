@@ -16,12 +16,13 @@ const gulp = require('gulp'),
     sourcemaps = require('gulp-sourcemaps'),
     log = require('gulplog'),
     babel = require('gulp-babel'),
+    babelify = require('babelify'),
     browserSync = require('browser-sync').create();
 
 const critical = require('critical').stream;
 
 const jsFiles = ['src/js/main.js', 'src/js/map.js', 'src/js/model.js', 'src/js/requests.js'];
-const yarnSrc = ['src/js/jquery.min.js', 'src/js/bootstrap.bundle.min.js', 'src/js/jquery-ui.min.js', 'src/js/knockout-latest.js'];
+const yarnSrc = ['src/js/jquery.min.js', 'src/js/bootstrap.bundle.min.js', 'src/js/jquery-ui.min.js', 'src/js/knockout.js'];
 const yarnCss = ['src/css/bootstrap.min.css', 'src/css/jquery-ui.min.css'];
 
 // JavaScript minifier
@@ -43,6 +44,16 @@ gulp.task('mini-js', function(done) {
   ];
 });
 
+// Babel
+gulp.task('babel', () =>
+    gulp.src(jsFiles)
+        .pipe(babel({
+            presets: ['env']
+        }))
+        .pipe(concat('main.min.js'))
+        .pipe(gulp.dest('src/js'))
+);
+
 // Browserify JS
 gulp.task('javascript', function () {
   // set up the browserify instance on a task basis
@@ -50,13 +61,14 @@ gulp.task('javascript', function () {
     entries: './src/js/main.js',
     debug: true
   });
+  b.transform(babelify, { "presets": [ "env" ] });
   return b.bundle()
     .pipe(source('src/js/main.js'))
     .pipe(buffer())
     .pipe(sourcemaps.init({loadMaps: true}))
         // Add transformation tasks to the pipeline here.
         .pipe(concat('main.min.js'))
-        .pipe(uglify({mangle: false}))
+        //.pipe(uglify({mangle: false}))
         .on('error', log.error)
     .pipe(sourcemaps.write('./'))
     .pipe(gulp.dest('dist/js'));

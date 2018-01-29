@@ -1,28 +1,44 @@
-"use strict";
+// "use strict";
 
-import places from 'js/model.js';
-import { initMap, googleError } from 'js/map.js';
-import { infoRequest, photoRequest } from 'js/requests.js';
+import $ from 'jquery';
+import 'knockout';
+import {
+    autocomplete,
+    filterNames
+} from './autocomplete';
+import places from './model';
+import mapOptions from './map';
+import {
+    infoRequest,
+    photoRequest,
+    datawindow,
+    ajaxError,
+    infoError,
+    venueUrl,
+    venuePhone,
+    infoArray,
+    url,
+    visiblePhotos,
+    flickrImg,
+    ownerId
+} from './requests';
 
 
 // *******************************
 // *          VIEW MODEL         *
 // *******************************
 
-initMap();
 
-const KoViewModel = () => {
-    let self = this;
+// Animate the scroll when #main-header is clicked.
+window.click = function () {
+    $('html, body').animate({
+        scrollTop: $("#list-view").offset().top
+    }, 'slow');
+};
 
-    // Animate the scroll when #main-header is clicked.
-    self.click = function() {
-        $('html, body').animate({
-            scrollTop: $("#list-view").offset().top
-        }, 'slow');
-    };
-
-    // Place Object
-    const Place = (place) => {
+// Place Object
+class Place {
+    constructor(place) {
         // Information used from the provided data model.
         this.id = place.id;
         this.name = place.name;
@@ -35,52 +51,72 @@ const KoViewModel = () => {
             lat: place.lat,
             lng: place.lng
         };
+    }
+}
+
+var map;
+var infowindow;
+var marker;
+
+window.initMap = function () {
+    // Create a map object and specify the DOM element for display.
+    map = new google.maps.Map(document.getElementById('map'), {
+        center: {
+            lat: 51.3517278,
+            lng: -2.9497165
+        },
+        scrollwheel: false,
+        zoom: 12,
+        styles: mapOptions
+    });
+    infowindow = new google.maps.InfoWindow();
+
+    marker = function (markerOptions) {
+        return new google.maps.Marker(markerOptions);
     };
 
-    const infowindow = new google.maps.InfoWindow();
+    ko.applyBindings(new KoViewModel());
+};
+
+// Error handling function for Google Map
+window.googleError = function () {
+    alert('Error: Your Google Map has failed to load');
+};
+
+var KoViewModel = function () {
+    var self = this;
 
     self.activeClick = ko.observable();
     self.collapsed = ko.observable(false);
 
-    self.venueUrl = ko.observable();
-    self.venuePhone = ko.observable();
-    self.infoArray = ko.observableArray();
-
-    self.infoError = ko.observable(false);
-    self.ajaxError = ko.observable(false);
-    self.visiblePhotos = ko.observableArray();
-    self.flickrImg = ko.observable();
-    self.ownerId = ko.observable();
-
     // Create observable array to hold each place from the data model.
     self.allPlaces = ko.observableArray();
 
-    places.forEach(function(place) {
+    places.forEach(function (place) {
         self.allPlaces().push(new Place(place));
     });
 
     // Build Markers via the Maps API and place them on the map.
     for (let place of self.allPlaces()) {
-
         var markerOptions = {
             position: place.latLng,
             map: map,
             animation: google.maps.Animation.DROP
         };
 
-        place.marker = new google.maps.Marker(markerOptions);
+        place.marker = marker(markerOptions);
 
         // Open infowindow and trigger marker animation when clicked.
-        place.marker.addListener('click', () => {
+        place.marker.addListener('click', function () {
             infowindow.open(map, place.marker);
             place.marker.setAnimation(google.maps.Animation.BOUNCE);
             setTimeout(() => {
                 place.marker.setAnimation(null);
             }, 1450);
             // Get data for the infowindow.
-            self.listClick(place);
-            self.infoRequest(place);
-            self.photoRequest(place);
+            window.listClick(place);
+            infoRequest(place);
+            infowindow.setContent(photoRequest(place));
         });
     }
 
@@ -90,38 +126,29 @@ const KoViewModel = () => {
         self.visiblePlaces.push(place);
     }
 
-    // Keep constant awareness of user input along with data-bind on <input> element.
-    self.userInput = ko.observable('');
-
     // Create array of place names for use with autocomplete plugin.
-    const filterNames = [];
+    //var filterNames = [];
     for (let place of self.allPlaces()) {
         filterNames.push(place.name);
     }
 
-    // Auto-complete jquery plugin.
-    $(function() {
-        $("#filter").autocomplete({
-            source: filterNames,
-            autoFocus: true,
-            select: function(e, ui) {
-                self.userInput(ui.item.value);
-            }
-        });
-    });
+    // Keep constant awareness of user input along with data-bind on <input> element.
+    global.userInput = ko.observable('');
 
     // Filter locations by name and tags depending on the user input.
-    self.filteredList = ko.computed(function() {
-        if (self.userInput()) {
-            var searchInput = self.userInput().toLowerCase();
+    self.filteredList = ko.computed(function () {
+        if (global.userInput()) {
+
+            var searchInput = global.userInput().toLowerCase();
+            console.log(searchInput);
         }
-        else if (!self.userInput()) {
-            return ko.utils.arrayFilter(self.allPlaces(), function(place) {
+        if (!global.userInput()) {
+            return ko.utils.arrayFilter(self.allPlaces(), function (place) {
                 place.marker.setVisible(true);
                 return place.name;
             });
         } else {
-            return ko.utils.arrayFilter(self.visiblePlaces(), function(place) {
+            return ko.utils.arrayFilter(self.visiblePlaces(), function (place) {
                 place.marker.setVisible(false);
                 infowindow.close();
                 self.collapsed(false);
@@ -136,12 +163,12 @@ const KoViewModel = () => {
     }, self);
 
     // Toggle 'active' class for filter buttons.
-    self.toggle = (id) => {
+    self.toggle = function (id) {
         infowindow.close();
         self.collapsed(false);
         var el = document.getElementById(id);
         var elementList = document.querySelectorAll('li');
-        elementList.forEach(function(element) {
+        elementList.forEach(function (element) {
             element.classList.remove('active');
         });
         if (el) {
@@ -150,19 +177,19 @@ const KoViewModel = () => {
     };
 
     // Open infowindow when list item is clicked.
-    self.markerTrigger = (data) => {
+    self.markerTrigger = function (data) {
         google.maps.event.trigger(data.marker, 'click');
     };
 
     // Toggle visibility of list item information when a marker is clicked.
-    self.listClick = (data) => {
+    window.listClick = function (data) {
         self.activeClick(data.id);
-        data.collapsed = ko.computed(function() {
+        console.log(data.id);
+        data.collapsed = ko.computed(function () {
             return (self.collapsed(false)) ? 'collapse in' + self.activeClick() : 'collapsed' + self.activeClick();
         }, self);
         self.collapsed(data.collapsed());
     };
 
-    self.infoRequest();
-    self.photoRequest();
+
 };

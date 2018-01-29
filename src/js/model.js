@@ -3,7 +3,7 @@
 // *******************************
 
 
-export const places = [{
+const places = [{
     id: '1',
     name: 'Brit Bar',
     address: '118 High St, Weston-super-Mare',
@@ -92,3 +92,5 @@ export const places = [{
     info: 'Worle railway station, on the Bristol to Exeter Line, serves the Worle, West Wick and St Georges suburbs of Weston-super-Mare in North Somerset, England.',
     tags: ['trains', 'stations', 'railway']
 }];
+
+export default places;

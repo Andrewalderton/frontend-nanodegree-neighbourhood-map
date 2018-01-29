@@ -86,17 +86,17 @@
                   <h6>ADDRESS</h6><span class="description" data-bind="text: address"></span><hr>
                   <h6>DESCRIPTION</h6><span class="description" data-bind="text: info"></span><hr>
 
-                  <div data-bind="if: $parent.venueUrl, if: $parent.venuePhone">
+                  <div data-bind="if: window.venueUrl, if: window.venuePhone">
                     <h6>CONTACT</h6>
-                    <span class="description" data-bind="html: $parent.venueUrl"></span><br>
-                    <span class="description" data-bind="text: $parent.venuePhone"></span>
+                    <span class="description" data-bind="html: window.venueUrl"></span><br>
+                    <span class="description" data-bind="text: window.venuePhone"></span>
                     <p class="info-error"><br><em>provided by Foursquare</em></p><hr>
                   </div>
-                  <div data-bind="visible: $parent.infoError ">
+                  <div data-bind="visible: window.infoError ">
                     <p class="info-error">Contact information not currently available for this location.</p>
                   </div>
-                  <span class="description" data-bind="html: $parent.visiblePhotos"></span>
-                  <div data-bind="visible: $parent.ajaxError">
+                  <span class="description" data-bind="html: window.visiblePhotos"></span>
+                  <div data-bind="visible: window.ajaxError">
                     <h5>Looks like there was a problem retrieving your data. Not all information may be available.</h5>
                   </div>
                 </div>
@@ -117,7 +117,7 @@
         <!-- build:js -->
         <script src="js/jquery.min.js"></script>
         <script src="js/bootstrap.bundle.min.js"></script>
-        <script src="js/knockout-latest.js"></script>
+        <script src="js/knockout.js"></script>
         <script src="js/jquery-ui.min.js"></script>
         <!-- endbuild -->
         <!-- build:js2 -->
@@ -126,7 +126,7 @@
         <script src="js/model.js"></script>
         <script src="js/requests.js"></script>
         <!-- endbuild-->
-        <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyC6gYqgR1FZFuqWnO3Lx9Rr0Hwc0FTBtn4&callback=initMap" async defer onerror="googleError()"></script>
+        <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyC6gYqgR1FZFuqWnO3Lx9Rr0Hwc0FTBtn4&callback=initMap" onerror="googleError()"></script>
     </div><!-- container -->
   </body>
 </html>

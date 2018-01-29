@@ -1,24 +1,33 @@
 {
   "name": "neighbourhood-map",
-  "version": "1.0.0",
+  "version": "1.5.0",
   "description": "Udacity front-end nanodegree project",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "deploy": "git subtree push --prefix dist origin gh-pages"
   },
+  "presets": [
+    "env",
+    {
+      "loose": true,
+      "allowTopLevelThis": true,
+      "modules": false
+    }
+  ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Andrewalderton/frontend-nanodegree-mobile-portfolio.git"
+    "url": "git+https://github.com/Andrewalderton/frontend-nanodegree-neighbourhood-map.git"
   },
   "author": "Andrew Alderton",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/Andrewalderton/frontend-nanodegree-mobile-portfolio/issues"
+    "url": "https://github.com/Andrewalderton/frontend-nanodegree-neighbourhood-map/issues"
   },
-  "homepage": "https://github.com/Andrewalderton/frontend-nanodegree-mobile-portfolio#readme",
+  "homepage": "https://github.com/Andrewalderton/frontend-nanodegree-neighbourhood-map#readme",
   "devDependencies": {
     "babel-core": "^6.26.0",
     "babel-preset-env": "^1.6.1",
+    "babelify": "^8.0.0",
     "browser-sync": "^2.23.6",
     "browserify": "^15.2.0",
     "critical": "^1.1.0",
