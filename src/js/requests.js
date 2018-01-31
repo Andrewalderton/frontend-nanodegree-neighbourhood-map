@@ -16,7 +16,7 @@
 
     var infoRequest;
     var photoRequest;
-    var datawindow;
+    global.infowindow = ko.observable();
 
     // Trigger Foursquare Ajax request.
     infoRequest = (place) => {
@@ -100,18 +100,18 @@
                     visiblePhotos(photoArray.join(""));
                 });
                 // Set infowindow content.
-                datawindow = infoArray() + '<br><br>' + '<img class="window-img" ' + photoArray[0] + photoArray[1];
+                global.infowindow().setContent(infoArray() + '<br><br>' + '<img class="window-img" ' + photoArray[0] + photoArray[1]);
 
             } else {
-                datawindow = infoArray() + '<p class="info-error">No photos found for this location.</p>';
+                global.infowindow().setContent(infoArray() + '<p class="info-error">No photos found for this location.</p>');
                 clearTimeout(place.apiTimeout);
                 ajaxError(true);
 
             }
         }).fail(function() {
             ajaxError(true);
-            infowindow.setContent(infoArray() + '<p class="info-error">No photos found for this location.</p>');
+            global.infowindow().setContent(infoArray() + '<p class="info-error">No photos found for this location.</p>');
         });
     };
 
-    export { infoRequest, photoRequest, datawindow, ajaxError, infoError, venueUrl, venuePhone, infoArray, url, visiblePhotos, flickrImg, ownerId };
+    export { infoRequest, photoRequest, infowindow, ajaxError, infoError, venueUrl, venuePhone, infoArray, url, visiblePhotos, flickrImg, ownerId };

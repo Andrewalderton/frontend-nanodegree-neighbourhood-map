@@ -36,24 +36,6 @@ window.click = function () {
     }, 'slow');
 };
 
-// Place Object
-class Place {
-    constructor(place) {
-        // Information used from the provided data model.
-        this.id = place.id;
-        this.name = place.name;
-        this.address = place.address;
-        this.lat = place.lat;
-        this.lng = place.lng;
-        this.tags = place.tags;
-        this.info = place.info;
-        this.latLng = {
-            lat: place.lat,
-            lng: place.lng
-        };
-    }
-}
-
 var map;
 var infowindow;
 var marker;
@@ -84,12 +66,28 @@ window.googleError = function () {
 };
 
 var KoViewModel = function () {
+    // Place Object
+    class Place {
+        constructor(place) {
+            // Information used from the provided data model.
+            this.id = place.id;
+            this.name = place.name;
+            this.address = place.address;
+            this.lat = place.lat;
+            this.lng = place.lng;
+            this.tags = place.tags;
+            this.info = place.info;
+            this.latLng = {
+                lat: place.lat,
+                lng: place.lng
+            };
+        }
+    }
+
     var self = this;
+
     window.venuePhone = venuePhone;
     window.infoError = infoError;
-    window.infoRequest = infoRequest;
-    window.photoRequest = photoRequest;
-    window.datawindow = datawindow;
     window.ajaxError = ajaxError;
     window.venueUrl = venueUrl;
     window.infoArray = infoArray;
@@ -98,6 +96,7 @@ var KoViewModel = function () {
     window.flickrImg = flickrImg;
     window.ownerId = ownerId;
 
+    global.infowindow = ko.observable(infowindow);
     self.activeClick = ko.observable();
     self.collapsed = ko.observable(false);
 
@@ -128,7 +127,7 @@ var KoViewModel = function () {
             // Get data for the infowindow.
             self.listClick(place);
             infoRequest(place);
-            infowindow.setContent(photoRequest(place));
+            photoRequest(place)
         });
     }
 
@@ -150,9 +149,7 @@ var KoViewModel = function () {
     // Filter locations by name and tags depending on the user input.
     self.filteredList = ko.computed(function () {
         if (global.userInput()) {
-
             var searchInput = global.userInput().toLowerCase();
-            console.log(searchInput);
         }
         if (!global.userInput()) {
             return ko.utils.arrayFilter(self.allPlaces(), function (place) {
@@ -162,7 +159,7 @@ var KoViewModel = function () {
         } else {
             return ko.utils.arrayFilter(self.visiblePlaces(), function (place) {
                 place.marker.setVisible(false);
-                infowindow.close();
+                window.infowindow().close();
                 self.collapsed(false);
                 self.activeClick(false);
                 self.toggle();
@@ -176,7 +173,7 @@ var KoViewModel = function () {
 
     // Toggle 'active' class for filter buttons.
     self.toggle = function (id) {
-        infowindow.close();
+        window.infowindow().close();
         self.collapsed(false);
         var el = document.getElementById(id);
         var elementList = document.querySelectorAll('li');

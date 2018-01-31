@@ -34,12 +34,12 @@ gulp.task('mini-js', function(done) {
       .pipe(uglify({mangle: false}))
       .pipe(gulp.dest('dist/js')),
 
-    gulp.src(jsFiles)
-      .pipe(plumber())
-      .pipe(concat('main.min.js'))
-      .pipe(gulp.dest('dist/js'))
-      .pipe(uglify({mangle: false}))
-      .pipe(gulp.dest('dist/js')),
+    // gulp.src(jsFiles)
+    //   .pipe(plumber())
+    //   .pipe(concat('main.min.js'))
+    //   .pipe(gulp.dest('dist/js'))
+    //   .pipe(uglify({mangle: false}))
+    //   .pipe(gulp.dest('dist/js')),
     done()
   ];
 });
@@ -68,7 +68,7 @@ gulp.task('javascript', function () {
     .pipe(sourcemaps.init({loadMaps: true}))
         // Add transformation tasks to the pipeline here.
         .pipe(concat('main.min.js'))
-        //.pipe(uglify({mangle: false}))
+        .pipe(uglify({mangle: false}))
         .on('error', log.error)
     .pipe(sourcemaps.write('./'))
     .pipe(gulp.dest('dist/js'));

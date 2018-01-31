@@ -21,7 +21,7 @@ const places = [{
     tags: ['bars', 'pubs', 'restaurant']
 }, {
     id: '3',
-    name: 'Yates\'s',
+    name: 'Yates',
     address: '12-20 Regent St, Weston-super-Mare',
     lat: 51.347643,
     lng: -2.979869842529297,

@@ -1,4 +1,5 @@
 /* Main Styles */
+
 h1,
 h2,
 h3,
@@ -26,10 +27,10 @@ a:hover {
 
 html,
 body {
-    height: 100%;
-    margin: 0;
-    padding: 0;
-    font: 400 0.9em/1.25em 'Montserrat', sans-serif;
+	height: 100%;
+	margin: 0;
+	padding: 0;
+	font: 400 0.9em/1.25em 'Montserrat', sans-serif;
 	color: #333;
 	background-color: #f2f2f2;
 }
@@ -40,12 +41,12 @@ body {
 
 .main-header {
 	position: absolute;
-    top: 40%;
-    left: 0;
-    width: 100%;
+	top: 40%;
+	left: 0;
+	width: 100%;
 	text-align: center;
 	margin: auto;
-	font: 700 1.5em/2em 'Montserrat' , sans-serif;
+	font: 700 1.5em/2em 'Montserrat', sans-serif;
 	color: #fb5e8d;
 }
 
@@ -56,6 +57,7 @@ body {
 }
 
 /* Images */
+
 img {
 	width: 100%;
 	max-height: 300px;
@@ -68,12 +70,12 @@ img {
 	position: relative;
 	overflow: hidden;
 	max-height: 100%;
-    height: 100vh;
-    width: 100vw;
-    object-fit: cover;
-    border-bottom: 2px solid #fb5e8d;
-    margin-bottom: 0;
-    padding: 0;
+	height: 100vh;
+	width: 100vw;
+	object-fit: cover;
+	border-bottom: 2px solid #fb5e8d;
+	margin-bottom: 0;
+	padding: 0;
 }
 
 .window-img {
@@ -82,6 +84,7 @@ img {
 }
 
 /* Google Map */
+
 .map {
 	width: 100%;
 	height: calc(100vh - 90px);
@@ -91,6 +94,7 @@ img {
 }
 
 /* Footer */
+
 footer {
 	text-align: center;
 	padding: 10px;
@@ -98,13 +102,14 @@ footer {
 }
 
 /* Navigation Styles */
+
 ul {
 	list-style: none;
 	margin: none;
 	padding: 10px;
 }
 
-li > a {
+li>a {
 	margin: 2rem 1rem;
 }
 
@@ -124,13 +129,12 @@ ul.nav {
 .nav-pills>li.active>a,
 .nav-pills>li.active>a:focus,
 .nav-pills>li.active>a:hover,
-.nav-pills>li>a:hover{
+.nav-pills>li>a:hover {
 	background-color: #fb5e8d;
 }
 
 .navbar-brand,
 .nav>li>a.navbar-brand {
-
 	margin: auto 0;
 	text-align: left;
 	background-color: transparent;
@@ -159,7 +163,6 @@ a.navbar-brand:hover {
 	padding-left: 0.5em;
 	border-radius: 100%;
 	color: white;
-
 }
 
 li>a.active {
@@ -178,9 +181,10 @@ li>a.active {
 }
 
 /* List-View Styles */
-.basic-addon1 > span,
-.basic-addon1 > span:active,
-.basic-addon1 > span:hover {
+
+.basic-addon1>span,
+.basic-addon1>span:active,
+.basic-addon1>span:hover {
 	cursor: default;
 	background-color: #f2f2f2;
 	box-shadow: none;
@@ -198,23 +202,24 @@ li>a.active {
 .list-group-item.active,
 .list-group-item.active:focus,
 .list-group-item.active:hover {
-	background-color:#333;
+	background-color: #333;
 	color: white;
 	outline: none;
 	border: none;
 }
 
 .list-group-item {
-    transition: width 2s, height 2s, background-color 0.2s,  transition-timing-function ease-in;
-    -webkit-transition: width 2s, height 2s, background-color 0.2s,  transition-timing-function ease-in;
+	transition: width 2s, height 2s, background-color 0.2s, transition-timing-function ease-in;
+	-webkit-transition: width 2s, height 2s, background-color 0.2s, transition-timing-function ease-in;
 }
 
-.no-gutter > [class*='col-'] {
-    padding-right:0;
-    padding-left:0;
+.no-gutter>[class*='col-'] {
+	padding-right: 0;
+	padding-left: 0;
 }
 
 /* Autocomplete Styles */
+
 .ui-menu-item {
 	color: white;
 	background-color: #333;
