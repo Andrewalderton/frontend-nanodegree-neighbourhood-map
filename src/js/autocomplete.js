@@ -10,7 +10,6 @@ var autocomplete = $(document).ready(function () {
         autoFocus: true,
         select: function (e, ui) {
             global.userInput(ui.item.value);
-            console.log(global.userInput());
         }
     });
 });

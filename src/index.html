@@ -8,6 +8,8 @@
     <link rel="icon" href="favicon.ico">
     <link href='https://fonts.googleapis.com/css?family=Montserrat:400,700' rel='stylesheet' type='text/css'>
     <!-- build:css -->
+    <link rel="stylesheet" href="css/font-awesome.min.css">
+
       <link rel="stylesheet" href="css/bootstrap.min.css">
       <link rel="stylesheet" href="css/jquery-ui.min.css">
     <!-- endbuild -->
@@ -24,41 +26,39 @@
           <![endif]-->
           <img id="main-img" class="main-img" src="img/landscapes-city-night-800.jpg" srcset="img/landscapes-city-night-400.jpg 400w, img/landscapes-city-night-800.jpg 800w, img/landscapes-city-night-1400.jpg 1400w" sizes="100vw" alt="city landscape at night">
           <a href="#" data-bind="click: function() { click() }">
-            <h1 class="main-header"><em>NEIGHBOURHOOD MAP</em><br><span class="main-icon glyphicon glyphicon-chevron-down"></span></h1>
+            <h1 class="main-header"><em>NEIGHBOURHOOD MAP</em><br><i class="main-icon fa fa-chevron-down" aria-hidden="true"></i></h1>
           </a>
         </div>
       </div>
 
       <div class="row no-gutter">
         <div class="col-sm-12" id="list-view">
-          <nav class="navbar navbar-default">
+          <nav class="navbar navbar-expand-md">
             <div class="container">
-              <div class="navbar-header">
-                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
-                  <span class="sr-only">Toggle navigation</span>
-                  <span class="icon-bar"></span>
-                  <span class="icon-bar"></span>
-                  <span class="icon-bar"></span>
-                </button>
-                <ul class="nav">
-                  <li><a href="#" class="navbar-brand" data-bind="click: function() { userInput('') }">
-                    <h4>NEIGHBOURHOOD: Weston-Super-Mare, UK</h4>
-                  </a></li>
-                </ul>
-              </div>
-              <div id="navbar" class="collapse navbar-collapse navbar-main">
+              <ul>
+                <li>
+                  <a href="#" class="navbar-brand nav-item" data-bind="click: function() { userInput('') }">
+                    <h4><b>NEIGHBOURHOOD:</b> Weston-Super-Mare, UK</h4>
+                  </a>
+                </li>
+              </ul>
+              <button type="button" class="navbar navbar-toggler navbar-toggler-right navbar-dark" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+              </button>
+            </div>
+            <div id="navbar" class="collapse navbar-collapse justify-content-end col-md-8">
 
                 <ul class="nav nav-pills nav-justified">
-                  <li id="1"><a href="#" data-bind="click: function() { userInput('Pubs'); toggle(1)}">Pubs</a></li>
-                  <li id="2"><a href="#" data-bind="click: function() { userInput('Attractions'); toggle(2)}">Attractions</a></li>
-                  <li id="3"><a href="#" data-bind="click: function() { userInput('Stations'); toggle(3)}">Stations</a></li>
-                  <li id="4"><a href="#" data-bind="click: function() { userInput(''); toggle(4)}">Reset<span class="reset glyphicon glyphicon-map-marker"></span></a></li>
+                  <li id="1" class="nav-item"><a href="#" class="nav-link" data-bind="click: function() { userInput('Pubs'); toggle(1)}">Pubs</a></li>
+                  <li id="2" class="nav-item"><a href="#" class="nav-link" data-bind="click: function() { userInput('Attractions'); toggle(2)}">Attractions</a></li>
+                  <li id="3" class="nav-item"><a href="#" class="nav-link" data-bind="click: function() { userInput('Stations'); toggle(3)}">Stations</a></li>
+                  <li id="4" class="nav-item"><a href="#" class="nav-link" data-bind="click: function() { userInput(''); toggle(4)}">Reset<i class="fa fa-map-marker reset" aria-hidden="true"></i></a></li>
                 </ul>
 
               </div><!-- /.nav-collapse -->
             </div><!-- /.container -->
           </nav><!-- /.navbar -->
-        </div>
+
       </div>
 
       <div class="row no-gutter">
@@ -72,8 +72,8 @@
             <div class="input-group">
               <input id="filter" type="text" class="form-control" placeholder="Search for..." data-bind="textInput: userInput">
               <span class="input-group-btn basic-addon1" id="basic-addon1" aria-label="filter">
-                <span class="btn btn-default" aria-hidden="true">
-                  <span class="glyphicon glyphicon-search"></span>
+                <span class="btn btn-secondary" aria-hidden="true">
+                  <i class="fa fa-search" aria-hidden="true"></i>
                 </span>
               </span>
             </div><!-- /input-group -->
@@ -82,21 +82,21 @@
               <button type="button" data-bind="text: name,  attr: { id: 'active'+id, class: 'collapse'+id + ' list-group-item btn-group-justified', 'aria-expanded': 'false', 'data-target': '#collapseText' + id }, click: function() { $parent.markerTrigger(this); }, css: { 'active' : 'collapse in'+ id === $parent.collapsed()}"></button>
 
               <div data-bind="attr: { id: 'collapseText' + id }, visible: 'collapse in' + id === $parent.collapsed()">
-                <div class="well">
+                <div class="card card-body">
                   <h6>ADDRESS</h6><span class="description" data-bind="text: address"></span><hr>
                   <h6>DESCRIPTION</h6><span class="description" data-bind="text: info"></span><hr>
 
-                  <div data-bind="if: window.venueUrl, if: window.venuePhone">
+                  <div data-bind="if: venueUrl, if: venuePhone">
                     <h6>CONTACT</h6>
-                    <span class="description" data-bind="html: window.venueUrl"></span><br>
-                    <span class="description" data-bind="text: window.venuePhone"></span>
+                    <span class="description" data-bind="html: venueUrl"></span><br>
+                    <span class="description" data-bind="text: venuePhone"></span>
                     <p class="info-error"><br><em>provided by Foursquare</em></p><hr>
                   </div>
-                  <div data-bind="visible: window.infoError ">
+                  <div data-bind="visible: infoError ">
                     <p class="info-error">Contact information not currently available for this location.</p>
                   </div>
-                  <span class="description" data-bind="html: window.visiblePhotos"></span>
-                  <div data-bind="visible: window.ajaxError">
+                  <span class="description" data-bind="html: visiblePhotos"></span>
+                  <div data-bind="visible: ajaxError">
                     <h5>Looks like there was a problem retrieving your data. Not all information may be available.</h5>
                   </div>
                 </div>

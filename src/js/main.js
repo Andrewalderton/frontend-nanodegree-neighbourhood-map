@@ -114,7 +114,7 @@ var KoViewModel = function () {
                 place.marker.setAnimation(null);
             }, 1450);
             // Get data for the infowindow.
-            window.listClick(place);
+            self.listClick(place);
             infoRequest(place);
             infowindow.setContent(photoRequest(place));
         });
@@ -182,14 +182,11 @@ var KoViewModel = function () {
     };
 
     // Toggle visibility of list item information when a marker is clicked.
-    window.listClick = function (data) {
+    self.listClick = function (data) {
         self.activeClick(data.id);
-        console.log(data.id);
         data.collapsed = ko.computed(function () {
             return (self.collapsed(false)) ? 'collapse in' + self.activeClick() : 'collapsed' + self.activeClick();
         }, self);
         self.collapsed(data.collapsed());
     };
-
-
 };

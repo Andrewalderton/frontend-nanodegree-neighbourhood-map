@@ -52,14 +52,17 @@
     "gulp-uglify": "^3.0.0",
     "gulplog": "^1.0.0",
     "jshint": "^2.9.5",
+    "popper.js": "^1.12.9",
     "vinyl-buffer": "^1.0.1",
     "vinyl-fs": "^3.0.2",
     "vinyl-source-stream": "^2.0.0"
   },
   "dependencies": {
     "bootstrap": "^4.0.0",
+    "font-awesome": "^4.7.0",
     "jquery": "^3.3.1",
     "jquery-ui": "^1.12.1",
-    "knockout": "^3.5.0-beta"
+    "knockout": "^3.5.0-beta",
+    "popper": "^1.0.1"
   }
 }
