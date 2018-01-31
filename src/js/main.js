@@ -85,6 +85,18 @@ window.googleError = function () {
 
 var KoViewModel = function () {
     var self = this;
+    window.venuePhone = venuePhone;
+    window.infoError = infoError;
+    window.infoRequest = infoRequest;
+    window.photoRequest = photoRequest;
+    window.datawindow = datawindow;
+    window.ajaxError = ajaxError;
+    window.venueUrl = venueUrl;
+    window.infoArray = infoArray;
+    window.url = url;
+    window.visiblePhotos = visiblePhotos;
+    window.flickrImg = flickrImg;
+    window.ownerId = ownerId;
 
     self.activeClick = ko.observable();
     self.collapsed = ko.observable(false);

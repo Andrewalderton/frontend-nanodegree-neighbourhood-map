@@ -38,7 +38,6 @@
 
         $.getJSON(foursquareUrl, (data) => {
             let venue = data.response.venues[0];
-            console.log(venue);
 
             if ((venue !== undefined) && (venue.hasOwnProperty('url'))) {
                 venueUrl('<a href="' + venue.url + '">' + venue.url + '</a>');
