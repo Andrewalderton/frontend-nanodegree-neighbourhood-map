@@ -1,10 +1,14 @@
+// *******************************
+// *       AUTOCOMPLETE         *
+// *******************************
+
+
 import 'jquery-ui/ui/widgets/autocomplete';
-//import 'knockout';
+
+const filterNames = [];
 
 // Auto-complete jquery plugin.
-var filterNames = [];
-//var userInput;
-var autocomplete = $(document).ready(function () {
+const autocomplete = $(document).ready(function () {
     $("#filter").autocomplete({
         source: filterNames,
         autoFocus: true,

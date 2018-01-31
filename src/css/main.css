@@ -1,5 +1,4 @@
 /* Main Styles */
-
 h1,
 h2,
 h3,
@@ -56,8 +55,12 @@ body {
 	text-align: center;
 }
 
-/* Images */
+.fa,
+.fa-chevron-down {
+	color: #fb5e8d;
+}
 
+/* Images */
 img {
 	width: 100%;
 	max-height: 300px;
@@ -84,7 +87,6 @@ img {
 }
 
 /* Google Map */
-
 .map {
 	width: 100%;
 	height: calc(100vh - 90px);
@@ -94,7 +96,6 @@ img {
 }
 
 /* Footer */
-
 footer {
 	text-align: center;
 	padding: 10px;
@@ -102,7 +103,6 @@ footer {
 }
 
 /* Navigation Styles */
-
 ul {
 	list-style: none;
 	margin: none;
@@ -111,6 +111,10 @@ ul {
 
 li>a {
 	margin: 2rem 1rem;
+}
+
+li>a.active {
+	background-color: #fb5e8d;
 }
 
 .nav,
@@ -123,6 +127,12 @@ ul.nav {
 .nav>li>a,
 .nav>li>a:hover {
 	background-color: #373737;
+	color: white;
+}
+
+.nav>li>a:active,
+.nav>li>a:focus {
+	background-color: #fb5e8d;
 	color: white;
 }
 
@@ -154,24 +164,9 @@ a.navbar-brand:hover {
 	border-radius: 0;
 }
 
-.fa,
-.fa-chevron-down {
-	color: #fb5e8d;
-}
-
 .reset {
 	padding-left: 0.5em;
 	border-radius: 100%;
-	color: white;
-}
-
-li>a.active {
-	background-color: #fb5e8d;
-}
-
-.nav>li>a:active,
-.nav>li>a:focus {
-	background-color: #fb5e8d;
 	color: white;
 }
 
@@ -219,7 +214,6 @@ li>a.active {
 }
 
 /* Autocomplete Styles */
-
 .ui-menu-item {
 	color: white;
 	background-color: #333;
@@ -234,8 +228,7 @@ li.ui.menu-item-wrapper.ui-state-focus,
 	background-color: #fb5e8d;
 }
 
-.ui-helper-hidden-accessible,
-.ui-helper-hidden-accessible:hover {
+.ui-helper-hidden-accessible {
 	display: none;
 	background-color: #333;
 }

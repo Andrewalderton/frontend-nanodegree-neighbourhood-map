@@ -1,5 +1,3 @@
-// "use strict";
-
 import $ from 'jquery';
 import 'knockout';
 import {
@@ -30,7 +28,7 @@ import {
 
 
 // Animate the scroll when #main-header is clicked.
-window.click = function () {
+window.click = () => {
     $('html, body').animate({
         scrollTop: $("#list-view").offset().top
     }, 'slow');
@@ -40,7 +38,7 @@ var map;
 var infowindow;
 var marker;
 
-window.initMap = function () {
+window.initMap = () => {
     // Create a map object and specify the DOM element for display.
     map = new google.maps.Map(document.getElementById('map'), {
         center: {
@@ -53,7 +51,7 @@ window.initMap = function () {
     });
     infowindow = new google.maps.InfoWindow();
 
-    marker = function (markerOptions) {
+    marker = (markerOptions) => {
         return new google.maps.Marker(markerOptions);
     };
 
@@ -61,7 +59,7 @@ window.initMap = function () {
 };
 
 // Error handling function for Google Map
-window.googleError = function () {
+window.googleError = () => {
     alert('Error: Your Google Map has failed to load');
 };
 
@@ -103,7 +101,7 @@ var KoViewModel = function () {
     // Create observable array to hold each place from the data model.
     self.allPlaces = ko.observableArray();
 
-    places.forEach(function (place) {
+    places.forEach((place) => {
         self.allPlaces().push(new Place(place));
     });
 
@@ -118,7 +116,7 @@ var KoViewModel = function () {
         place.marker = marker(markerOptions);
 
         // Open infowindow and trigger marker animation when clicked.
-        place.marker.addListener('click', function () {
+        place.marker.addListener('click', () => {
             infowindow.open(map, place.marker);
             place.marker.setAnimation(google.maps.Animation.BOUNCE);
             setTimeout(() => {
@@ -138,7 +136,6 @@ var KoViewModel = function () {
     }
 
     // Create array of place names for use with autocomplete plugin.
-    //var filterNames = [];
     for (let place of self.allPlaces()) {
         filterNames.push(place.name);
     }
@@ -147,17 +144,17 @@ var KoViewModel = function () {
     global.userInput = ko.observable('');
 
     // Filter locations by name and tags depending on the user input.
-    self.filteredList = ko.computed(function () {
+    self.filteredList = ko.computed(() => {
         if (global.userInput()) {
             var searchInput = global.userInput().toLowerCase();
         }
         if (!global.userInput()) {
-            return ko.utils.arrayFilter(self.allPlaces(), function (place) {
+            return ko.utils.arrayFilter(self.allPlaces(), (place) => {
                 place.marker.setVisible(true);
                 return place.name;
             });
         } else {
-            return ko.utils.arrayFilter(self.visiblePlaces(), function (place) {
+            return ko.utils.arrayFilter(self.visiblePlaces(), (place) => {
                 place.marker.setVisible(false);
                 window.infowindow().close();
                 self.collapsed(false);
@@ -172,7 +169,7 @@ var KoViewModel = function () {
     }, self);
 
     // Toggle 'active' class for filter buttons.
-    self.toggle = function (id) {
+    self.toggle = (id) => {
         window.infowindow().close();
         self.collapsed(false);
         var el = document.getElementById(id);
@@ -186,14 +183,14 @@ var KoViewModel = function () {
     };
 
     // Open infowindow when list item is clicked.
-    self.markerTrigger = function (data) {
+    self.markerTrigger = (data) => {
         google.maps.event.trigger(data.marker, 'click');
     };
 
     // Toggle visibility of list item information when a marker is clicked.
-    self.listClick = function (data) {
+    self.listClick = (data) => {
         self.activeClick(data.id);
-        data.collapsed = ko.computed(function () {
+        data.collapsed = ko.computed(() => {
             return (self.collapsed(false)) ? 'collapse in' + self.activeClick() : 'collapsed' + self.activeClick();
         }, self);
         self.collapsed(data.collapsed());

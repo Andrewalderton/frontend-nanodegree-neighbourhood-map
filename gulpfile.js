@@ -21,9 +21,19 @@ const gulp = require('gulp'),
 
 const critical = require('critical').stream;
 
-const jsFiles = ['src/js/main.js', 'src/js/map.js', 'src/js/model.js', 'src/js/requests.js'];
-const yarnSrc = ['src/js/jquery.min.js', 'src/js/bootstrap.bundle.min.js', 'src/js/jquery-ui.min.js', 'src/js/knockout.js'];
-const yarnCss = ['src/css/bootstrap.min.css', 'src/css/jquery-ui.min.css', 'src/css/font-awesome.min.css'];
+const jsFiles = ['src/js/main.js',
+                 'src/js/map.js',
+                 'src/js/model.js',
+                 'src/js/requests.js'];
+
+const yarnSrc = ['src/js/vendor/jquery.min.js',
+                 'src/js/vendor/bootstrap.bundle.min.js',
+                 'src/js/vendor/jquery-ui.min.js',
+                 'src/js/vendor/knockout-latest.js'];
+
+const yarnCss = ['src/css/vendor/bootstrap.min.css',
+                 'src/css/vendor/jquery-ui.min.css',
+                 'src/css/vendor/font-awesome.min.css'];
 
 // JavaScript minifier
 gulp.task('mini-js', function(done) {
